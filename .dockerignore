@@ -1,0 +1,10 @@
+# Python
+__pycache__
+app.egg-info
+*.pyc
+.coverage
+htmlcov
+.venv
+.ruff_cache
+.ropeproject
+.pytest_cache
