@@ -1,0 +1,21 @@
+services:
+  cantuscatholici-api:
+    image: cantuscatholici-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: ["fastapi", "dev", "app/main.py"]
+    volumes:
+      - ./app:/app/app:rw
+    develop:
+      watch:
+        - action: rebuild
+          path: Dockerfile
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: compose.yaml

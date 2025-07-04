@@ -4,15 +4,29 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 
 ## Developing
 
+Developing the app is solved using **docker compose**. Just run:
+  1. `docker compose up --watch`.
+  2. When you are done, press `Ctrl+C` or `docker compose down`.
+
+Changes in application are automatically reflected in docker container. However, code linting
+and type checking is not integrated.
+
 **Setup of development environment**:
   1. First install [uv](https://docs.astral.sh/uv/getting-started/installation/).
   2. After installation, run `uv sync`.
-  3. Then run `uv run fastapi dev`.
-  4. You are ready to go.
 
 **Code linting** (code with ruff check errors will not be merged):
   1. Just run `uv run ruff check`.
   2. Fix errors, go to step 1.
+
+**Type checking** (code with pyright errors will not be merged):
+  1. Run `uv run pyright ./`.
+  2. Fix errors, go to step 1.
+
+You are ready to create merge request.
+
+**Type checking**
+
 
 **Adding dependencies**:
 
