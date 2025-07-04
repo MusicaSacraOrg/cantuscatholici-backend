@@ -1,6 +1,6 @@
 services:
   cantuscatholici-api:
-    image: cantuscatholici-api
+    image: '${DOCKER_IMAGE?Variable not set}:${TAG-latest}'
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,3 +19,31 @@ services:
           path: pyproject.toml
         - action: rebuild
           path: compose.yaml
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  db:
+    image: postgres:17.5-alpine
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    volumes:
+      - cantuscatholici-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+volumes:
+  cantuscatholici-data:

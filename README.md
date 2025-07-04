@@ -8,6 +8,9 @@ Developing the app is solved using **docker compose**. Just run:
   1. `docker compose up --watch`.
   2. When you are done, press `Ctrl+C` or `docker compose down`.
 
+When you want to delete database contents, run `docker compose down -v`, which
+will delete mounted volumes.
+
 Changes in application are automatically reflected in docker container. However, code linting
 and type checking is not integrated.
 
