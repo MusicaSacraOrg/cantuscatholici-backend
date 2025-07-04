@@ -1,7 +1,10 @@
 FROM python:3.12-alpine
 
 # Install the musescore package
-RUN apk add --no-cache musescore
+RUN apk add --no-cache musescore nodejs npm
+
+# Install svgo
+RUN npm install -g svgo --unsafe-perm
 
 # Run musescore in headless mode
 ENV QT_QPA_PLATFORM=offscreen
