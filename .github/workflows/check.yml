@@ -17,6 +17,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: [ruff, pyright]
     steps:
       - uses: ./.github/actions/project-setup
       - name: Pytest
