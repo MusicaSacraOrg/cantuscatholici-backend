@@ -8,3 +8,5 @@ htmlcov
 .ruff_cache
 .ropeproject
 .pytest_cache
+.github
+.env*
