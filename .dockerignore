@@ -10,3 +10,4 @@ htmlcov
 .pytest_cache
 .github
 .env*
+app/tests/
