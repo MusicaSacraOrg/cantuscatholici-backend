@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import Session, create_engine
 
-from app.config import postgres_settings
+from app.config import log_settings, postgres_settings
 
 engine = create_engine(
     str(postgres_settings.postgres_dsn),
-    echo=True,
+    echo=log_settings.db_engine_echo,
 )
 
 
