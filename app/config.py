@@ -34,4 +34,15 @@ class PostgresSettings(BaseSettings):
     )
 
 
+class LogSettings(BaseSettings):
+    db_engine_echo: bool = False
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="LOG_",
+        extra="ignore",
+    )
+
+
 postgres_settings = PostgresSettings()  # pyright: ignore[reportCallIssue]
+log_settings = LogSettings()
