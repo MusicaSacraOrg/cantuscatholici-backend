@@ -30,7 +30,7 @@ class PostgresSettings(BaseSettings):
         env_file=".env",
         secrets_dir="/run/secrets",
         env_prefix="POSTGRES_",
-        extra="allow",
+        extra="ignore",
     )
 
 
