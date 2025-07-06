@@ -6,6 +6,12 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_USER=cantuscatholici
+      - POSTGRES_DB=cantuscatholici
+      - POSTGRES_PORT=5432
     ports:
       - "8000:8000"
     command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
@@ -30,16 +36,17 @@ services:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=cantuscatholici
+      - POSTGRES_DB=cantuscatholici
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
+      - POSTGRES_PORT=5432
     ports:
       - "5432:5432"
     volumes:
       - cantuscatholici-data:/var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U cantuscatholici -d cantuscatholici"]
+      interval: 5s
       retries: 5
       start_period: 30s
       timeout: 10s
