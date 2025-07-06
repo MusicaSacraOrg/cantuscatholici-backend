@@ -23,6 +23,8 @@ jobs:
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       POSTGRES_HOST: localhost
+      DOCKER_IMAGE: ${{ vars.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ vars.DOCKER_IMAGE_NAME }}
+      TAG: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/project-setup
