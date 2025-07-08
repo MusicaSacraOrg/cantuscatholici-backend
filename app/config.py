@@ -1,3 +1,6 @@
+import re
+from enum import StrEnum
+
 from pydantic import (
     PostgresDsn,
     computed_field,
@@ -44,5 +47,32 @@ class LogSettings(BaseSettings):
     )
 
 
+class StaticContentFileTypes(StrEnum):
+    SVG_FILE = "svg"
+    PDF_FILE = "pdf"
+    MUSESCORE_FILE = "mscz"
+    MP3_FILE = "mp3"
+
+
+class AppSettings(BaseSettings):
+    static_content_prefix: str = "data/cantuscatholici"
+
+    @computed_field
+    @property
+    def static_content_db_file_path_regex(self) -> str:
+        file_types = [
+            re.escape(file_type.value) for file_type in StaticContentFileTypes
+        ]
+        file_type_regex = r"|".join(file_types)
+        return rf"{self.static_content_prefix}/\w*\.(?:{file_type_regex})\.bz"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="APP_",
+        extra="ignore",
+    )
+
+
 postgres_settings = PostgresSettings()  # pyright: ignore[reportCallIssue]
 log_settings = LogSettings()
+app_settings = AppSettings()
