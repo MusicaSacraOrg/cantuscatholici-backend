@@ -5,7 +5,7 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 ## Developing
 
 Developing the app is solved using **docker compose**. Just run:
-  1. `docker compose up --watch`.
+  1. `docker compose up --build --watch`.
   2. When you are done, press `Ctrl+C` or `docker compose down`.
 
 When you want to delete database contents, run `docker compose down -v`, which
@@ -26,10 +26,13 @@ and type checking is not integrated.
   1. Run `uv run pyright ./`.
   2. Fix errors, go to step 1.
 
-You are ready to create merge request.
+**Running tests**
 
-**Type checking**
+Always write a simple unit test for an endpoint.
+  1. `docker compose up -d db`.
+  2. `uv run pytest` in root folder of repo.
 
+You are ready to create a merge request.
 
 **Adding dependencies**:
 
