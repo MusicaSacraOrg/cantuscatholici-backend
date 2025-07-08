@@ -55,7 +55,7 @@ class StaticContentFileTypes(StrEnum):
 
 
 class AppSettings(BaseSettings):
-    static_content_prefix: str = "data/cantuscatholici"
+    static_content_prefix: str = "/data/cantuscatholici"
 
     @computed_field
     @property
