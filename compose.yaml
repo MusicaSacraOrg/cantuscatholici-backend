@@ -10,11 +10,14 @@ services:
       - POSTGRES_USER=cantuscatholici
       - POSTGRES_DB=cantuscatholici
       - POSTGRES_PORT=5432
+      - LOG_DB_ENGINE_ECHO${LOG_DB_ENGINE_ECHO-False}
+      - APP_STATIC_CONTENT_PREFIX=${APP_STATIC_CONTENT_PREFIX}
     ports:
       - "8000:8000"
     command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
     volumes:
       - ./app:/app/app:rw
+      - cantuscatholici-static-content:${APP_STATIC_CONTENT_PREFIX}
     develop:
       watch:
         - action: rebuild
@@ -49,3 +52,4 @@ services:
 
 volumes:
   cantuscatholici-data:
+  cantuscatholici-static-content:
