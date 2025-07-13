@@ -3,10 +3,9 @@ import os
 import pytest
 from dotenv import set_key
 from fastapi.testclient import TestClient
-from sqlmodel import Session
 
 import app.config as config
-from app.database import engine
+from app.database import Base, SessionLocal, engine
 from app.main import app
 
 
@@ -15,13 +14,17 @@ def testclient() -> TestClient:
     """Creates and returns test client"""
     return TestClient(app)
 
-
 @pytest.fixture(scope="function", name="session")
 def session_fixture():
     """Creates and returns a database session"""
-    with Session(engine) as session:
-        yield session
+    Base.metadata.create_all(bind=engine)
 
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function", name="testenv", autouse=True)
 def testenv_fixture(
