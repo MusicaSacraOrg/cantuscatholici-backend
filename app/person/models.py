@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -13,3 +15,7 @@ class Person(Base):
     description: Mapped[str | None] = mapped_column(nullable=True)
     avatar: Mapped[int | None] = mapped_column(
         ForeignKey('static_content.id'), nullable=True)
+
+    __mapper_args__: ClassVar = {
+        "polymorphic_identity": "persons",
+    }
