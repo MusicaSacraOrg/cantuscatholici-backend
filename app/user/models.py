@@ -16,7 +16,7 @@ class User(Person):
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     mobile: Mapped[str] = mapped_column(nullable=True, unique=True)
     role_id: Mapped[int] = mapped_column(
-        ForeignKey('user_role.id'), nullable=False)
+        ForeignKey('user_roles.id'), nullable=False)
     registered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

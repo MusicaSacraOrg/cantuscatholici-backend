@@ -22,7 +22,7 @@ class Song(ContentBase):
     search_tag_id: Mapped[int | None] = mapped_column(
         ForeignKey('tags.id'), nullable=True)
     song_part_id: Mapped[int | None] = mapped_column(
-        ForeignKey('song_part.id'), nullable=True)
+        ForeignKey('song_parts.id'), nullable=True)
     song_order_id: Mapped[int | None] = mapped_column(
         ForeignKey('song_order.id'), nullable=True)
     mscz_id: Mapped[int | None] = mapped_column(
@@ -55,21 +55,21 @@ class SongOrder(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order: Mapped[int] = mapped_column(nullable=False)
     part_id: Mapped[int] = mapped_column(
-        ForeignKey('song_part.id'), nullable=False)
+        ForeignKey('song_parts.id'), nullable=False)
 
 
 class SongPart(Base):
-    __tablename__ = 'song_part'
+    __tablename__ = 'song_parts'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tag_id: Mapped[int] = mapped_column(
         ForeignKey('tags.id'), nullable=False)
     verses_id: Mapped[int | None] = mapped_column(
-        ForeignKey('song_verse.id'), nullable=True)
+        ForeignKey('song_verses.id'), nullable=True)
 
 
 class SongVerse(Base):
-    __tablename__ = 'song_verse'
+    __tablename__ = 'song_verses'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     order: Mapped[int] = mapped_column(nullable=False)
@@ -87,7 +87,7 @@ class SongMr(Base):
     redactor_id: Mapped[int] = mapped_column(
         ForeignKey('users.id'), nullable=False)
     comments: Mapped[int | None] = mapped_column(
-        ForeignKey('review_comment.id'), nullable=True)
+        ForeignKey('review_comments.id'), nullable=True)
     closed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

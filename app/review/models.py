@@ -7,7 +7,7 @@ from app.database import Base
 
 
 class ReviewComment(Base):
-    __tablename__ = 'review_comment'
+    __tablename__ = 'review_comments'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     commenter_id: Mapped[int] = mapped_column(

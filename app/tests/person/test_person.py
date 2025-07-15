@@ -100,7 +100,6 @@ def test_person_optional_fields(session):
 
 
 def test_person_avatar_foreign_key_constraint(session):
-    # Person with non-existent avatar id
     person = Person(name="John", surname="Doe", avatar=999999)
     session.add(person)
 
@@ -117,10 +116,8 @@ def test_person_avatar_relationship(session):
     session.add(person)
     session.commit()
 
-    # Verify relation
     assert person.avatar == static_content.id
 
-    # Update avatar
     new_static_content = StaticContent(path="/images/new_profile.jpg")
     session.add(new_static_content)
     session.commit()
@@ -129,5 +126,4 @@ def test_person_avatar_relationship(session):
     session.commit()
 
     updated_person = session.query(Person).filter_by(id=person.id).first()
-    # Verify relation again
     assert updated_person.avatar == new_static_content.id
