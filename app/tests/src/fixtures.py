@@ -17,14 +17,13 @@ def testclient() -> TestClient:
 @pytest.fixture(scope="function", name="session")
 def session_fixture():
     """Creates and returns a database session"""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    db = SessionLocal()
-    try:
+    with SessionLocal() as db:
         yield db
-    finally:
-        db.close()
-        Base.metadata.drop_all(bind=engine)
+
+    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function", name="testenv", autouse=True)
 def testenv_fixture(
