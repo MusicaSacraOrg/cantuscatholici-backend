@@ -12,6 +12,7 @@ services:
       - POSTGRES_PORT=5432
       - LOG_DB_ENGINE_ECHO=${LOG_DB_ENGINE_ECHO?Variable not set}
       - APP_STATIC_CONTENT_PREFIX=${APP_STATIC_CONTENT_PREFIX?Variable not set}
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY?Variable not set}
     ports:
       - "8000:8000"
     command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
