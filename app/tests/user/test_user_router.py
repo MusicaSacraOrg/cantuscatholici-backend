@@ -50,10 +50,10 @@ def test_user_register_returns_token_and_me_works_with_token(testclient):
     r = _register_user(testclient)
     assert r.status_code == 200, f"{r.text}"
     data = r.json()
-    assert "access_token" in data and data.get("token_type") == "bearer"
+    assert "accessToken" in data and data.get("tokenType") == "bearer"
 
     # Call /me with token
-    me = testclient.get("/user", headers=_auth_header(data["access_token"]))
+    me = testclient.get("/user", headers=_auth_header(data["accessToken"]))
     assert me.status_code == 200, f"{me.text}"
     me_data = me.json()
     assert me_data["email"] == "alice@example.com"
@@ -68,7 +68,7 @@ def test_user_login_success_after_register(testclient):
     r = _login(testclient, "bob@example.com", "pw123456")
     assert r.status_code == 200
     j = r.json()
-    assert "access_token" in j and j.get("token_type") == "bearer"
+    assert "accessToken" in j and j.get("tokenType") == "bearer"
 
 
 def test_user_login_wrong_password(testclient):
