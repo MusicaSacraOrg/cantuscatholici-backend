@@ -14,6 +14,7 @@ class User(Person):
     id: Mapped[int] = mapped_column(
         ForeignKey('persons.id'), primary_key=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
     mobile: Mapped[str] = mapped_column(nullable=True, unique=True)
     role_id: Mapped[int] = mapped_column(
         ForeignKey('user_roles.id'), nullable=False)

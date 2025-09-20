@@ -17,6 +17,7 @@ def test_create_user(session):
         surname="Doe",
         email="john.doe@example.com",
         mobile="1234567890",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     session.add(user)
@@ -39,6 +40,7 @@ def test_create_user_without_optional_mobile(session):
         surname="Doe",
         email="jane.doe@example.com",
         mobile=None,
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     session.add(user)
@@ -65,6 +67,7 @@ def test_user_email_must_be_unique(session):
         surname="Tester",
         email="duplicate@example.com",
         mobile="1111111111",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     user2 = User(
@@ -94,6 +97,7 @@ def test_user_mobile_must_be_unique_if_set(session):
         surname="Smith",
         email="charlie@example.com",
         mobile="9999999999",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     user2 = User(
@@ -101,6 +105,7 @@ def test_user_mobile_must_be_unique_if_set(session):
         surname="Smith",
         email="delta@example.com",
         mobile="9999999999",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
 
@@ -112,10 +117,3 @@ def test_user_mobile_must_be_unique_if_set(session):
         session.commit()
 
     session.rollback()
-
-
-def test_dummy(
-    testclient,
-):
-    response = testclient.get("/user")
-    assert response.status_code == 200
