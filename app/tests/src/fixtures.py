@@ -9,10 +9,11 @@ from app.database import Base, SessionLocal, engine
 from app.main import app
 
 
-@pytest.fixture(scope="session")
-def testclient() -> TestClient:
-    """Creates and returns test client"""
-    return TestClient(app)
+@pytest.fixture(scope="function")
+def testclient(session):  # noqa: ARG001
+    """Creates and returns TestClient with lifespan events"""
+    with TestClient(app) as client:
+        yield client
 
 
 @pytest.fixture(scope="function", name="session", autouse=True)
