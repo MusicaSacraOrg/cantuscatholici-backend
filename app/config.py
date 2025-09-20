@@ -73,6 +73,19 @@ class AppSettings(BaseSettings):
     )
 
 
+class AuthSettings(BaseSettings):
+    secret_key: str
+    algorithm: str = "HS512"
+    access_token_expire_minutes: int = 30
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="AUTH_",
+        extra="ignore",
+    )
+
+
 postgres_settings = PostgresSettings()  # pyright: ignore[reportCallIssue]
 log_settings = LogSettings()
 app_settings = AppSettings()
+auth_settings = AuthSettings()  # pyright: ignore[reportCallIssue]
