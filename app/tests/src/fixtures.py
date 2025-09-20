@@ -14,7 +14,8 @@ def testclient() -> TestClient:
     """Creates and returns test client"""
     return TestClient(app)
 
-@pytest.fixture(scope="function", name="session")
+
+@pytest.fixture(scope="function", name="session", autouse=True)
 def session_fixture():
     """Creates and returns a database session"""
     Base.metadata.drop_all(bind=engine)
@@ -24,6 +25,7 @@ def session_fixture():
         yield db
 
     Base.metadata.drop_all(bind=engine)
+
 
 @pytest.fixture(scope="function", name="testenv", autouse=True)
 def testenv_fixture(
