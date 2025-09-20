@@ -14,7 +14,7 @@ from app.user_role.service import ensure_all_exist
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI):  # noqa: ARG001
     # ensure all predefined user roles exist
     with SessionLocal() as db:
         ensure_all_exist(db)
