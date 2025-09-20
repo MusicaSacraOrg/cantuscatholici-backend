@@ -44,6 +44,7 @@ def setup_related_entities(session):
         surname="User",
         email="uploader@example.com",
         role_id=role.id,
+        hashed_password="hashed_password",
     )
     session.add(user)
     session.flush()
