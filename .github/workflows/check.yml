@@ -17,7 +17,7 @@ jobs:
       - name: Pyright
         run: uv run pyright ./
 
-  test:
+  test-migration:
     runs-on: ubuntu-latest
     needs: [ruff, pyright]
     env:
@@ -35,5 +35,26 @@ jobs:
       - name: Setup database service
         run: docker compose up -d db
       - name: Pytest
-        run: uv run pytest
+        run: uv run pytest -m alembic
+      - run: docker compose down -v --remove-orphans
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [ruff, pyright, test-migration]
+    env:
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: localhost
+      DOCKER_IMAGE: ${{ vars.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ vars.DOCKER_IMAGE_NAME }}
+      LOG_DB_ENGINE_ECHO: True
+      APP_STATIC_CONTENT_PREFIX: /data/cantuscatholici/dummy
+      AUTH_SECRET_KEY: ${{ secrets.AUTH_SECRET_KEY }}
+      TAG: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/project-setup
+      - run: docker compose down -v --remove-orphans
+      - name: Setup database service
+        run: docker compose up -d db
+      - name: Pytest
+        run: uv run pytest -m "not alembic"
       - run: docker compose down -v --remove-orphans
