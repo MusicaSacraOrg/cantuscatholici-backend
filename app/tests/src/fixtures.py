@@ -5,27 +5,22 @@ from dotenv import set_key
 from fastapi.testclient import TestClient
 
 import app.config as config
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal
 from app.main import app
 
 
 @pytest.fixture(scope="function")
-def testclient(session):  # noqa: ARG001
+def testclient(init_schema):  # noqa: ARG001
     """Creates and returns TestClient with lifespan events"""
     with TestClient(app) as client:
         yield client
 
 
 @pytest.fixture(scope="function", name="session", autouse=True)
-def session_fixture():
+def session_fixture(init_schema):  # noqa: ARG001
     """Creates and returns a database session"""
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
     with SessionLocal() as db:
         yield db
-
-    Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="function", name="testenv", autouse=True)
