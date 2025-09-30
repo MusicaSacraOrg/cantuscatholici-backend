@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from sqlalchemy import DateTime, ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.content_base.models import ContentBase
 from app.person.models import Person
+
+if TYPE_CHECKING:
+    from app.user_role.models import UserRole
 
 
 class User(Person):
@@ -23,6 +26,9 @@ class User(Person):
         nullable=False,
         server_default=func.now(),
     )
+
+    # relationship
+    role: Mapped["UserRole"] = relationship("UserRole", back_populates="users")
 
 
 class UserContent(ContentBase):
