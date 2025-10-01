@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from starlette.responses import JSONResponse
 
 from app.calendar.router import calendar_router
+from app.common.exceptions import DomainError
 from app.database import SessionLocal
 from app.review.router import review_router
 from app.song.router import song_router
@@ -23,6 +25,23 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+@app.exception_handler(DomainError)
+async def handle_domain_error(request: Request, exc: DomainError):
+    payload = {
+        "type": f"https://cantuscatholici.sk/probs/{exc.code}",
+        "detail": str(exc),
+        "instance": str(request.url),
+        **exc.extra,
+    }
+    return JSONResponse(
+        payload,
+        status_code=exc.http_status,
+        media_type="application/problem+json",
+        headers=exc.headers or None,
+    )
+
 
 app.include_router(calendar_router)
 app.include_router(static_content_router)
