@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, ClassVar
 
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.content_base.models import ContentBase
@@ -24,7 +24,7 @@ class User(Person):
     registered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
 
     # relationship
@@ -50,7 +50,7 @@ class UserContent(ContentBase):
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
 
     __mapper_args__: ClassVar = {
