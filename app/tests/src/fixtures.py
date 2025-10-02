@@ -39,12 +39,6 @@ def testenv_fixture(
         key_to_set="APP_STATIC_CONTENT_PREFIX",
         value_to_set=str(static_content_prefix),
     )
-    # Set database logging to always true
-    set_key(
-        dotenv_path=env_file_path,
-        key_to_set="LOG_DB_ENGINE_ECHO",
-        value_to_set="True",
-    )
 
     config.app_settings = config.AppSettings(
         _env_file=env_file_path,  # pyright: ignore [reportCallIssue]
