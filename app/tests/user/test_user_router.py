@@ -58,7 +58,7 @@ def test_user_register_returns_token_and_me_works_with_token(testclient):
     assert me_data["email"] == "alice@example.com"
     assert me_data["name"] == "Alice"
     assert me_data["surname"] == "A"
-    assert me_data["mobile"] == "+14155552671"
+    assert me_data["mobile"] == "tel:+1-415-555-2671"
     assert "id" in me_data
 
 
