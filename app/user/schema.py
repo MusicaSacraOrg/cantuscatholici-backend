@@ -11,6 +11,7 @@ from pydantic import (
     SecretStr,
 )
 from pydantic.alias_generators import to_camel, to_snake
+from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from app.person.schema import PersonCreate, PersonInDb
 from app.user_role.service import PredefinedUserRoles
@@ -80,7 +81,7 @@ class Token(BaseModel):
 
 class UserBase(BaseModel):
     email: EmailStr
-    mobile: str | None = Field(default=None)
+    mobile: PhoneNumber | None = Field(default=None)
     role: str = Field(default=PredefinedUserRoles.USER)
 
     model_config = ConfigDict(
