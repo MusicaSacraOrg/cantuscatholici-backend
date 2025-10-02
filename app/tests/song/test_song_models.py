@@ -9,6 +9,7 @@ from app.person.models import Person
 from app.song.models import Song, SongOrder, SongPart
 from app.static_content.models import StaticContent
 from app.tag.models import Tag
+from app.tag_category.models import TagCategory
 from app.user.models import User, UserContent
 from app.user_role.models import UserRole
 
@@ -27,7 +28,11 @@ def setup_related_entities(session):
     session.add(author)
     session.flush()
 
-    tag = Tag(name="Worship")
+    category = TagCategory(name="Category", color="#FF0000")
+    session.add(category)
+    session.flush()
+
+    tag = Tag(name="Worship", category_id=category.id)
     session.add(tag)
     session.flush()
 
