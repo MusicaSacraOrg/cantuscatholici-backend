@@ -14,7 +14,8 @@ class Person(Base):
     surname: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str | None] = mapped_column(nullable=True)
     avatar: Mapped[int | None] = mapped_column(
-        ForeignKey("static_content.id"), nullable=True
+        ForeignKey("static_content.id"),
+        nullable=True,
     )
 
     __mapper_args__: ClassVar = {

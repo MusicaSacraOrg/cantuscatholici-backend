@@ -12,5 +12,6 @@ class CalendarEntry(Base):
     title: Mapped[str | None] = mapped_column(nullable=True)
     description: Mapped[str | None] = mapped_column(nullable=True)
     recommended_song_id: Mapped[int | None] = mapped_column(
-        ForeignKey("songs.id"), nullable=True
+        ForeignKey("songs.id"),
+        nullable=True,
     )

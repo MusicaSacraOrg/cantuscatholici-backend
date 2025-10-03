@@ -16,28 +16,36 @@ class Song(ContentBase):
     author: Mapped[int] = mapped_column(ForeignKey("persons.id"), nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     added_by_user_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id"), nullable=True
+        ForeignKey("users.id"),
+        nullable=True,
     )
     search_tag_id: Mapped[int | None] = mapped_column(
-        ForeignKey("tags.id"), nullable=True
+        ForeignKey("tags.id"),
+        nullable=True,
     )
     song_part_id: Mapped[int | None] = mapped_column(
-        ForeignKey("song_parts.id"), nullable=True
+        ForeignKey("song_parts.id"),
+        nullable=True,
     )
     song_order_id: Mapped[int | None] = mapped_column(
-        ForeignKey("song_order.id"), nullable=True
+        ForeignKey("song_order.id"),
+        nullable=True,
     )
     mscz_id: Mapped[int | None] = mapped_column(
-        ForeignKey("mscz_content.id"), nullable=True
+        ForeignKey("mscz_content.id"),
+        nullable=True,
     )
     user_content_id: Mapped[int | None] = mapped_column(
-        ForeignKey("user_content.id"), nullable=True
+        ForeignKey("user_content.id"),
+        nullable=True,
     )
     related_id: Mapped[int | None] = mapped_column(
-        ForeignKey("songs.id"), nullable=True
+        ForeignKey("songs.id"),
+        nullable=True,
     )
     lang_tag_id: Mapped[int | None] = mapped_column(
-        ForeignKey("tags.id"), nullable=True
+        ForeignKey("tags.id"),
+        nullable=True,
     )
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -70,7 +78,8 @@ class SongPart(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tag_id: Mapped[int] = mapped_column(ForeignKey("tags.id"), nullable=False)
     verses_id: Mapped[int | None] = mapped_column(
-        ForeignKey("song_verses.id"), nullable=True
+        ForeignKey("song_verses.id"),
+        nullable=True,
     )
 
 
@@ -87,12 +96,14 @@ class SongMr(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     reviewable_id: Mapped[int] = mapped_column(
-        ForeignKey("content_base.id"), nullable=False
+        ForeignKey("content_base.id"),
+        nullable=False,
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     redactor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     comments: Mapped[int | None] = mapped_column(
-        ForeignKey("review_comments.id"), nullable=True
+        ForeignKey("review_comments.id"),
+        nullable=True,
     )
     closed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

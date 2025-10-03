@@ -12,7 +12,8 @@ class Author(Person):
 
     id: Mapped[int] = mapped_column(ForeignKey("persons.id"), primary_key=True)
     added_by_user_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id"), nullable=True
+        ForeignKey("users.id"),
+        nullable=True,
     )
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

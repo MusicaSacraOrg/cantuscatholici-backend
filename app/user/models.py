@@ -36,14 +36,17 @@ class UserContent(ContentBase):
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=True)
     file_id: Mapped[int | None] = mapped_column(
-        ForeignKey("static_content.id"), nullable=True
+        ForeignKey("static_content.id"),
+        nullable=True,
     )
     mscz_id: Mapped[int | None] = mapped_column(
-        ForeignKey("mscz_content.id"), nullable=True
+        ForeignKey("mscz_content.id"),
+        nullable=True,
     )
     author: Mapped[str] = mapped_column(nullable=True)
     added_by_user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), nullable=False
+        ForeignKey("users.id"),
+        nullable=False,
     )
     tag_id: Mapped[int | None] = mapped_column(ForeignKey("tags.id"), nullable=True)
     added_at: Mapped[datetime] = mapped_column(
