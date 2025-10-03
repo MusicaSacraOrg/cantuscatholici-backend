@@ -29,6 +29,7 @@ def test_delete_content_base(session):
     session.delete(content_base)
     session.commit()
 
-    deleted_content_base = session.query(
-        ContentBase).filter_by(id=content_base.id).first()
+    deleted_content_base = (
+        session.query(ContentBase).filter_by(id=content_base.id).first()
+    )
     assert deleted_content_base is None

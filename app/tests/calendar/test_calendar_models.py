@@ -16,7 +16,8 @@ def test_create_calendar_entry(session):
     session.flush()
     session.commit()
 
-    entry = CalendarEntry(api_id="abc123",
+    entry = CalendarEntry(
+        api_id="abc123",
         title="Meeting",
         description="Daily sync",
         recommended_song_id=song.id,
@@ -92,7 +93,8 @@ def test_get_calendar_entry(session):
     session.add(song)
     session.commit()
 
-    entry = CalendarEntry(api_id="read123",
+    entry = CalendarEntry(
+        api_id="read123",
         title="Read Event",
         recommended_song_id=song.id,
     )
