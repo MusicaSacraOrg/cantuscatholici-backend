@@ -32,7 +32,7 @@ services:
         restart: true
 
   db:
-    image: postgres:17.5-alpine
+    image: postgres:17.6-alpine
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_USER=cantuscatholici
