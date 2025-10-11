@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from sqlalchemy import DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.content_base.models import ContentBase
 from app.person.models import Person
+
+if TYPE_CHECKING:
+    from app.user_role.models import UserRole
 
 
 class User(Person):
@@ -14,14 +17,18 @@ class User(Person):
     id: Mapped[int] = mapped_column(
         ForeignKey('persons.id'), primary_key=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    hashed_password: Mapped[str] = mapped_column(nullable=False)
     mobile: Mapped[str] = mapped_column(nullable=True, unique=True)
     role_id: Mapped[int] = mapped_column(
         ForeignKey('user_roles.id'), nullable=False)
     registered_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
+
+    # relationship
+    role: Mapped["UserRole"] = relationship("UserRole", back_populates="users")
 
 
 class UserContent(ContentBase):
@@ -43,7 +50,7 @@ class UserContent(ContentBase):
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
 
     __mapper_args__: ClassVar = {

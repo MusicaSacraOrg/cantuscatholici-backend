@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import ClassVar
 
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.content_base.models import ContentBase
@@ -36,12 +36,13 @@ class Song(ContentBase):
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
     last_edit_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
     __mapper_args__: ClassVar = {
@@ -90,6 +91,5 @@ class SongMr(Base):
         ForeignKey('review_comments.id'), nullable=True)
     closed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        nullable=False,
-        default=datetime.now(),
+        nullable=True,
     )

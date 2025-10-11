@@ -5,25 +5,23 @@ from dotenv import set_key
 from fastapi.testclient import TestClient
 
 import app.config as config
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal
 from app.main import app
 
 
-@pytest.fixture(scope="session")
-def testclient() -> TestClient:
-    """Creates and returns test client"""
-    return TestClient(app)
+@pytest.fixture(scope="function")
+def testclient(init_schema):  # noqa: ARG001
+    """Creates and returns TestClient with lifespan events"""
+    with TestClient(app) as client:
+        yield client
 
-@pytest.fixture(scope="function", name="session")
-def session_fixture():
+
+@pytest.fixture(scope="function", name="session", autouse=True)
+def session_fixture(init_schema):  # noqa: ARG001
     """Creates and returns a database session"""
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
     with SessionLocal() as db:
         yield db
 
-    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope="function", name="testenv", autouse=True)
 def testenv_fixture(
@@ -40,12 +38,6 @@ def testenv_fixture(
         dotenv_path=env_file_path,
         key_to_set="APP_STATIC_CONTENT_PREFIX",
         value_to_set=str(static_content_prefix),
-    )
-    # Set database logging to always true
-    set_key(
-        dotenv_path=env_file_path,
-        key_to_set="LOG_DB_ENGINE_ECHO",
-        value_to_set="True",
     )
 
     config.app_settings = config.AppSettings(

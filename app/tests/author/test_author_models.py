@@ -17,6 +17,7 @@ def test_create_author(session):
         name="Admin",
         surname="User",
         email="admin@example.com",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     session.add(user)
@@ -79,12 +80,14 @@ def test_update_author(session):
         name="User1",
         surname="Smith",
         email="user1@example.com",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     user2 = User(
         name="User2",
         surname="Jones",
         email="user2@example.com",
+        hashed_password="hashed_password",
         role_id=role.id,
     )
     session.add_all([user1, user2])

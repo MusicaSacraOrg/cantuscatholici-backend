@@ -42,6 +42,10 @@ ENV PYTHONPATH=/app
 
 COPY ./pyproject.toml ./uv.lock /app/
 
+COPY ./alembic /app/alembic
+
+COPY ./alembic.ini /app/
+
 COPY ./app /app/app
 
 # Sync the project

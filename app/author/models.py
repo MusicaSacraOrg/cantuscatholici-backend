@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import ClassVar
 
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.person.models import Person
@@ -17,7 +17,7 @@ class Author(Person):
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.now(),
+        server_default=func.now(),
     )
 
     __mapper_args__: ClassVar = {

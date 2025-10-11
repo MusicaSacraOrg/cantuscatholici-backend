@@ -13,7 +13,13 @@ def test_create_review_comment(session):
     session.add(role)
     session.flush()
 
-    user = User(name="Test", surname="User", email="test@example.com", role_id=role.id)
+    user = User(
+        name="Test",
+        surname="User",
+        email="test@example.com",
+        role_id=role.id,
+        hashed_password="hashed_password",
+    )
     session.add(user)
     session.commit()
 
@@ -39,7 +45,13 @@ def test_review_comment_required_fields(session):
     session.add(role)
     session.flush()
 
-    user = User(name="John", surname="Doe", email="john@example.com", role_id=role.id)
+    user = User(
+        name="John",
+        surname="Doe",
+        email="john@example.com",
+        role_id=role.id,
+        hashed_password="hashed_password",
+    )
     session.add(user)
     session.commit()
 
@@ -61,6 +73,7 @@ def test_review_comment_timestamp_default(session):
         surname="Smith",
         email="alice@example.com",
         role_id=role.id,
+        hashed_password="hashed_password",
     )
     session.add(user)
     session.commit()
@@ -78,7 +91,13 @@ def test_delete_review_comment(session):
     session.add(role)
     session.flush()
 
-    user = User(name="Bob", surname="Doe", email="bob@example.com", role_id=role.id)
+    user = User(
+        name="Bob",
+        surname="Doe",
+        email="bob@example.com",
+        role_id=role.id,
+        hashed_password="hashed_password",
+    )
     session.add(user)
     session.commit()
 
