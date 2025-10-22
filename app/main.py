@@ -19,7 +19,6 @@ from app.user_role.router import user_role_router
 from app.user_role.service import ensure_all_exist
 
 load_dotenv("../.env")
-ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 
 
 @asynccontextmanager
@@ -50,14 +49,12 @@ async def handle_domain_error(request: Request, exc: DomainError):
     )
 
 
-if ENVIRONMENT == "dev":
+if os.getenv("ENVIRONMENT", "dev") == "dev":
     ORIGINS = ["*"]
     ORIGIN_REGEX = None
 else:
     ORIGINS = []
     ORIGIN_REGEX = r"^https:\/\/([a-z0-9-]+\.)?cantuscatholici\.sk$"
-
-print("ORIGINS", ORIGINS)
 
 app.add_middleware(
     CORSMiddleware,
