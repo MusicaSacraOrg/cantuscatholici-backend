@@ -1,5 +1,7 @@
+import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -15,6 +17,9 @@ from app.tag.router import tag_router
 from app.user.router import user_router
 from app.user_role.router import user_role_router
 from app.user_role.service import ensure_all_exist
+
+load_dotenv("../.env")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 
 
 @asynccontextmanager
@@ -45,14 +50,14 @@ async def handle_domain_error(request: Request, exc: DomainError):
     )
 
 
-ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8000",
-]
+if ENVIRONMENT == "dev":
+    ORIGINS = ["*"]
+    ORIGIN_REGEX = None
+else:
+    ORIGINS = []
+    ORIGIN_REGEX = r"^https:\/\/([a-z0-9-]+\.)?cantuscatholici\.sk$"
 
-ORIGIN_REGEX = r"^https:\/\/([a-z0-9-]+\.)?cantuscatholici\.sk$"
+print("ORIGINS", ORIGINS)
 
 app.add_middleware(
     CORSMiddleware,
