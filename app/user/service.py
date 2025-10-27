@@ -9,16 +9,19 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from datetime import UTC, datetime, timedelta
+
 from app.config import auth_settings
 from app.database import DbSessionDep
 from app.person.schema import PersonInDb
-from app.user.auth import get_password_hash, verify_password
+from app.user.auth import create_refresh_token, get_password_hash, verify_password
 from app.user.exceptions import (
     EmailTakenException,
     InvalidCredentialsException,
+    InvalidRefreshTokenException,
     MobileTakenException,
 )
-from app.user.models import User
+from app.user.models import RefreshToken, User
 from app.user.schema import UserInDb
 from app.user_role.models import UserRole
 
@@ -27,7 +30,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def get_user(session: Session, email: str) -> UserInDb | None:
     stmt = (
-        select(User, UserRole.role).join(User.role).where(User.email == email).limit(1)
+        select(
+            User,
+            UserRole.role).join(
+            User.role).where(
+            User.email == email).limit(1)
     )
     row = session.execute(stmt).first()
     if not row:
@@ -36,7 +43,38 @@ def get_user(session: Session, email: str) -> UserInDb | None:
     user, role_str = row._tuple()
 
     # Get all Person fields from the ORM object, then enrich with User fields
-    person_part = PersonInDb.model_validate(user, from_attributes=True).model_dump()
+    person_part = PersonInDb.model_validate(
+        user, from_attributes=True).model_dump()
+
+    return UserInDb.model_validate(
+        {
+            **person_part,  # fields from PersonInDb (id, names, etc.)
+            "email": user.email,
+            "mobile": user.mobile,
+            "role": role_str,
+            "hashed_password": user.hashed_password,
+            "registered_at": user.registered_at,
+        },
+    )
+
+
+def get_user_by_id(session: Session, user_id: int) -> UserInDb | None:
+    stmt = (
+        select(
+            User,
+            UserRole.role).join(
+            User.role).where(
+            User.id == user_id).limit(1)
+    )
+    row = session.execute(stmt).first()
+    if not row:
+        return None
+
+    user, role_str = row._tuple()
+
+    # Get all Person fields from the ORM object, then enrich with User fields
+    person_part = PersonInDb.model_validate(
+        user, from_attributes=True).model_dump()
 
     return UserInDb.model_validate(
         {
@@ -95,7 +133,9 @@ def create_user(
     mobile: str | None,
     description: str | None,
 ) -> User:
-    role_id_sq = select(UserRole.id).where(UserRole.role == "User").scalar_subquery()
+    role_id_sq = select(
+        UserRole.id).where(
+        UserRole.role == "User").scalar_subquery()
 
     user = User(
         email=email,
@@ -122,3 +162,66 @@ def create_user(
         raise
 
     return user
+
+
+def create_refresh_token_for_user(
+        session: Session, user_id: int) -> RefreshToken:
+    """Create and store a refresh token for a user."""
+    refresh_token_str = create_refresh_token()
+    expires_at = datetime.now(
+        UTC) + timedelta(days=auth_settings.refresh_token_expire_days)
+
+    refresh_token = RefreshToken(
+        token=refresh_token_str,
+        user_id=user_id,
+        expires_at=expires_at,
+    )
+
+    session.add(refresh_token)
+    session.flush()  # Flush to get ID without committing
+    session.refresh(refresh_token)
+    session.commit()  # Ensure the token is committed to the database
+
+    return refresh_token
+
+
+def verify_refresh_token_db(session: Session, token: str) -> RefreshToken:
+    """Verify a refresh token and return it if valid."""
+    stmt = select(RefreshToken).where(
+        RefreshToken.token == token,
+        RefreshToken.is_revoked == False
+    ).limit(1)
+
+    refresh_token = session.execute(stmt).scalar_one_or_none()
+
+    if not refresh_token:
+        raise InvalidRefreshTokenException("Invalid refresh token")
+
+    if refresh_token.expires_at < datetime.now(UTC):
+        raise InvalidRefreshTokenException("Refresh token has expired")
+
+    return refresh_token
+
+
+def revoke_refresh_token(session: Session, token: str) -> None:
+    """Revoke a refresh token."""
+    stmt = select(RefreshToken).where(RefreshToken.token == token).limit(1)
+    refresh_token = session.execute(stmt).scalar_one_or_none()
+
+    if refresh_token:
+        refresh_token.is_revoked = True
+        # Don't commit here - let the caller handle transaction
+
+
+def revoke_all_user_refresh_tokens(session: Session, user_id: int) -> None:
+    """Revoke all refresh tokens for a user (useful for security events)."""
+    stmt = select(RefreshToken).where(
+        RefreshToken.user_id == user_id,
+        RefreshToken.is_revoked == False
+    )
+    refresh_tokens = session.execute(stmt).scalars().all()
+
+    for token in refresh_tokens:
+        token.is_revoked = True
+
+    # Don't commit here - let the caller handle transaction
