@@ -47,7 +47,8 @@ PASSWORD_CHECKS = [
         lambda s: any(c.isupper() for c in s),
         "Password must contain an uppercase letter",
     ),
-    (lambda s: any(c.islower() for c in s), "Password must contain a lowercase letter"),
+    (lambda s: any(c.islower()
+     for c in s), "Password must contain a lowercase letter"),
     (
         lambda s: any(c in SPECIAL_CHARS for c in s),
         f"Password must contain a special character ({SPECIAL_CHARS})",
@@ -69,12 +70,24 @@ def validate_password(password: SecretStr):
 
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
 
     model_config = ConfigDict(
         alias_generator=AliasGenerator(
             validation_alias=to_snake,
             serialization_alias=to_camel,
+        ),
+    )
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_camel,
+            serialization_alias=to_snake,
         ),
     )
 
