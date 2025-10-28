@@ -1,11 +1,13 @@
 name: Test
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   test-migration:
     runs-on: ubuntu-latest
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_USER: cantuscatholici
+      POSTGRES_DB: cantuscatholici
       POSTGRES_HOST: localhost
       DOCKER_IMAGE: ${{ vars.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ vars.DOCKER_IMAGE_NAME }}
       LOG_DB_ENGINE_ECHO: True
@@ -16,8 +18,10 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/project-setup
       - run: docker compose down -v --remove-orphans
-      - name: Setup database service
-        run: docker compose up -d db
+      - name: Setup database service and wait for health
+        run: |
+          docker compose up -d db
+          docker compose wait --max-inactivity 60s db
       - name: Pytest migrations
         run: uv run pytest -m alembic
       - run: docker compose down -v --remove-orphans
@@ -27,6 +31,8 @@ jobs:
     needs: [test-migration]
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_USER: cantuscatholici
+      POSTGRES_DB: cantuscatholici
       POSTGRES_HOST: localhost
       DOCKER_IMAGE: ${{ vars.DOCKER_REGISTRY }}/${{ github.repository_owner }}/${{ vars.DOCKER_IMAGE_NAME }}
       LOG_DB_ENGINE_ECHO: True
@@ -37,8 +43,10 @@ jobs:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/project-setup
       - run: docker compose down -v --remove-orphans
-      - name: Setup database service
-        run: docker compose up -d db
+      - name: Setup database service and wait for health
+        run: |
+          docker compose up -d db
+          docker compose wait --max-inactivity 60s db
       - name: Pytest app
         run: uv run pytest -m "not alembic"
       - run: docker compose down -v --remove-orphans
