@@ -5,6 +5,8 @@ on:
 
 jobs:
   test-migration:
+    # Run workflows in fork on push, or in main repo on PR
+    if: github.repository == 'ByteMyPawn/cantuscatholici-backend' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     env:
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
@@ -29,6 +31,8 @@ jobs:
       - run: docker compose down -v --remove-orphans
 
   test:
+    # Run workflows in fork on push, or in main repo on PR
+    if: github.repository == 'ByteMyPawn/cantuscatholici-backend' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     needs: [test-migration]
     env:
