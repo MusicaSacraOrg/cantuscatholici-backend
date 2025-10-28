@@ -1,3 +1,4 @@
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
@@ -8,8 +9,6 @@ from pydantic import SecretStr
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
-from datetime import UTC, datetime, timedelta
 
 from app.config import auth_settings
 from app.database import DbSessionDep
@@ -189,7 +188,7 @@ def verify_refresh_token_db(session: Session, token: str) -> RefreshToken:
     """Verify a refresh token and return it if valid."""
     stmt = select(RefreshToken).where(
         RefreshToken.token == token,
-        RefreshToken.is_revoked == False
+        ~RefreshToken.is_revoked,
     ).limit(1)
 
     refresh_token = session.execute(stmt).scalar_one_or_none()
@@ -217,7 +216,7 @@ def revoke_all_user_refresh_tokens(session: Session, user_id: int) -> None:
     """Revoke all refresh tokens for a user (useful for security events)."""
     stmt = select(RefreshToken).where(
         RefreshToken.user_id == user_id,
-        RefreshToken.is_revoked == False
+        ~RefreshToken.is_revoked,
     )
     refresh_tokens = session.execute(stmt).scalars().all()
 

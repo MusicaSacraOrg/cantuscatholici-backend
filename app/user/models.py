@@ -31,7 +31,7 @@ class User(Person):
     # relationships
     role: Mapped["UserRole"] = relationship("UserRole", back_populates="users")
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
-        "RefreshToken", back_populates="user", cascade="all, delete-orphan"
+        "RefreshToken", back_populates="user", cascade="all, delete-orphan",
     )
 
 

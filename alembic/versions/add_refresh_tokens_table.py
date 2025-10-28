@@ -9,7 +9,6 @@ Create Date: 2025-01-XX XX:XX:XX.XXXXXX
 from collections.abc import Sequence
 
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 from alembic import op
 

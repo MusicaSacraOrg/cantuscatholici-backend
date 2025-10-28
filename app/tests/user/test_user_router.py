@@ -1,7 +1,7 @@
+import time
 from logging import getLogger
 
 from starlette import status
-import time
 
 global_logger = getLogger(__name__)
 
