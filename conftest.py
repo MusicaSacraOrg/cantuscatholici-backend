@@ -1,5 +1,6 @@
-import alembic.command
 import pytest
+
+import alembic.command
 from alembic.config import Config
 
 pytest_plugins = [
