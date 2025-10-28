@@ -23,7 +23,7 @@ jobs:
       - name: Setup database service and wait for health
         run: |
           docker compose up -d db
-          docker compose wait --max-inactivity 60s db
+          docker compose wait db
       - name: Pytest migrations
         run: uv run pytest -m alembic
       - run: docker compose down -v --remove-orphans
@@ -48,7 +48,7 @@ jobs:
       - name: Setup database service and wait for health
         run: |
           docker compose up -d db
-          docker compose wait --max-inactivity 60s db
+          docker compose wait db
       - name: Pytest app
         run: uv run pytest -m "not alembic"
       - run: docker compose down -v --remove-orphans
