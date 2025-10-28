@@ -50,7 +50,7 @@ async def login(
     return Token(
         access_token=access_token,
         refresh_token=refresh_token_obj.token,
-        token_type="bearer"
+        token_type="bearer",
     )
 
 
@@ -79,7 +79,7 @@ async def register(
     return Token(
         access_token=access_token,
         refresh_token=refresh_token_obj.token,
-        token_type="bearer"
+        token_type="bearer",
     )
 
 
