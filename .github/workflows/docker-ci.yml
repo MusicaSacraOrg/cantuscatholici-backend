@@ -23,7 +23,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@v3
         with:
-          cosign-release: 'v2.5.2'
+          cosign-release: "v2.5.2"
 
       - name: Extract Docker image metadata
         id: meta
