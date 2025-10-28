@@ -23,7 +23,7 @@ jobs:
       - name: Setup database service and wait for health
         run: |
           docker compose up -d db
-          docker compose wait db
+          timeout 60 bash -c 'until docker compose exec -T db pg_isready -U cantuscatholici; do sleep 1; done'
       - name: Pytest migrations
         run: uv run pytest -m alembic
       - run: docker compose down -v --remove-orphans
@@ -48,7 +48,7 @@ jobs:
       - name: Setup database service and wait for health
         run: |
           docker compose up -d db
-          docker compose wait db
+          timeout 60 bash -c 'until docker compose exec -T db pg_isready -U cantuscatholici; do sleep 1; done'
       - name: Pytest app
         run: uv run pytest -m "not alembic"
       - run: docker compose down -v --remove-orphans
