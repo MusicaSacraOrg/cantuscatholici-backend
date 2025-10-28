@@ -40,18 +40,22 @@ def upgrade() -> None:
             server_default="false"),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("token"),
     )
     op.create_index(
-        "ix_refresh_tokens_token",
+        op.f("ix_refresh_tokens_token"),
         "refresh_tokens",
         ["token"],
         unique=True)
-    op.create_index("ix_refresh_tokens_user_id", "refresh_tokens", ["user_id"])
+    op.create_index(
+        op.f("ix_refresh_tokens_user_id"),
+        "refresh_tokens",
+        ["user_id"])
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_index("ix_refresh_tokens_user_id", table_name="refresh_tokens")
-    op.drop_index("ix_refresh_tokens_token", table_name="refresh_tokens")
+    op.drop_index(
+        op.f("ix_refresh_tokens_user_id"),
+        table_name="refresh_tokens")
+    op.drop_index(op.f("ix_refresh_tokens_token"), table_name="refresh_tokens")
     op.drop_table("refresh_tokens")
