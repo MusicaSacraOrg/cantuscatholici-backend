@@ -1,6 +1,7 @@
-from alembic.config import Config
-import alembic.command
 import pytest
+
+import alembic.command
+from alembic.config import Config
 
 pytest_plugins = [
     "app.tests.src.fixtures",
