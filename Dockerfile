@@ -46,6 +46,8 @@ COPY ./alembic /app/alembic
 
 COPY ./alembic.ini /app/
 
+COPY ./conftest.py /app/
+
 COPY ./app /app/app
 
 # Sync the project
