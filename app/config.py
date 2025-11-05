@@ -77,6 +77,7 @@ class AuthSettings(BaseSettings):
     secret_key: str
     algorithm: str = "HS512"
     access_token_expire_minutes: int = 30
+    refresh_token_expire_days: int = 7
 
     model_config = SettingsConfigDict(
         env_file=".env",

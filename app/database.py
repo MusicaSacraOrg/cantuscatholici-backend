@@ -15,8 +15,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+
 def get_session():
     with SessionLocal() as db:
         yield db
+
 
 DbSessionDep = Annotated[Session, Depends(get_session)]

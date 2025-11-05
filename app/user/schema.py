@@ -79,6 +79,28 @@ class Token(BaseModel):
     )
 
 
+class TokenWithRefresh(Token):
+    refresh_token: str
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
 class UserBase(BaseModel):
     email: EmailStr
     mobile: PhoneNumber | None = Field(default=None)

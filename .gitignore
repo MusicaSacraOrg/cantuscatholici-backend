@@ -15,3 +15,17 @@ wheels/
 .env*
 
 .idea/
+
+# OS / editors
+.DS_Store
+app/.DS_Store
+.vscode/
+.pycharm-venv/
+
+# uv / tools / caches
+.uv/
+.mypy_cache/
+coverage.xml
+htmlcov/
+.coverage
+*.log

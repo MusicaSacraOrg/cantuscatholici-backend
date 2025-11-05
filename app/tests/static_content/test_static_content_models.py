@@ -25,8 +25,9 @@ def test_get_static_content(session):
     session.add(static_content)
     session.commit()
 
-    retrieved_content = session.query(StaticContent).filter_by(
-        path="/images/avatar.jpg").first()
+    retrieved_content = (
+        session.query(StaticContent).filter_by(path="/images/avatar.jpg").first()
+    )
     assert retrieved_content is not None
     assert retrieved_content.path == "/images/avatar.jpg"
     assert isinstance(retrieved_content.id, int)
@@ -40,8 +41,9 @@ def test_update_static_content(session):
     static_content.path = "/images/new_avatar.jpg"
     session.commit()
 
-    updated_content = session.query(StaticContent).filter_by(
-        id=static_content.id).first()
+    updated_content = (
+        session.query(StaticContent).filter_by(id=static_content.id).first()
+    )
     assert updated_content.path == "/images/new_avatar.jpg"
 
 
@@ -53,8 +55,9 @@ def test_delete_static_content(session):
     session.delete(static_content)
     session.commit()
 
-    deleted_content = session.query(StaticContent).filter_by(
-        id=static_content.id).first()
+    deleted_content = (
+        session.query(StaticContent).filter_by(id=static_content.id).first()
+    )
     assert deleted_content is None
 
 

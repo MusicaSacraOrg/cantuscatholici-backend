@@ -48,6 +48,7 @@ def test_delete_user_role(session):
     deleted_user_role = session.query(UserRole).filter_by(id=user_role.id).first()
     assert deleted_user_role is None
 
+
 def test_user_role_unique_constraint(session):
     user_role1 = UserRole(role="Admin")
     user_role2 = UserRole(role="Admin")
