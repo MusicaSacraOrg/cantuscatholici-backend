@@ -9,7 +9,7 @@ from app.config import auth_settings
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
 def verify_password(plain_password: SecretStr, hashed_password: SecretStr) -> bool:
@@ -31,10 +31,25 @@ def create_access_token(
 ):
     to_encode = data.copy()
     expire = datetime.now(UTC) + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
+    to_encode.update({"exp": expire, "type": "access"})
+    return jwt.encode(
         to_encode,
         auth_settings.secret_key,
         algorithm=auth_settings.algorithm,
     )
-    return encoded_jwt
+
+
+def create_refresh_token(
+    data: dict,
+    expires_delta: timedelta = timedelta(
+        days=auth_settings.refresh_token_expire_days,
+    ),
+):
+    to_encode = data.copy()
+    expire = datetime.now(UTC) + expires_delta
+    to_encode.update({"exp": expire, "type": "refresh"})  # ⬅️ dôležité odlíšenie
+    return jwt.encode(
+        to_encode,
+        auth_settings.secret_key,
+        algorithm=auth_settings.algorithm,
+    )

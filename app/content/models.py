@@ -8,18 +8,21 @@ from app.content_base.models import ContentBase
 
 
 class MsczContent(ContentBase):
-    __tablename__ = 'mscz_content'
+    __tablename__ = "mscz_content"
 
-    id: Mapped[int] = mapped_column(
-        ForeignKey('content_base.id'), primary_key=True)
+    id: Mapped[int] = mapped_column(ForeignKey("content_base.id"), primary_key=True)
     c_mscz_file_id: Mapped[int] = mapped_column(
-        ForeignKey('static_content.id'), nullable=False)
+        ForeignKey("static_content.id"), nullable=False
+    )
     c_svg_file_id: Mapped[int] = mapped_column(
-        ForeignKey('static_content.id'), nullable=False)
+        ForeignKey("static_content.id"), nullable=False
+    )
     pdf_file_id: Mapped[int] = mapped_column(
-        ForeignKey('static_content.id'), nullable=False)
+        ForeignKey("static_content.id"), nullable=False
+    )
     mp3_file_id: Mapped[int | None] = mapped_column(
-        ForeignKey('static_content.id'), nullable=True)
+        ForeignKey("static_content.id"), nullable=True
+    )
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

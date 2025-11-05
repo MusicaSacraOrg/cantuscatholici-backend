@@ -22,7 +22,7 @@ from app.user.models import User
 from app.user.schema import UserInDb
 from app.user_role.models import UserRole
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login")
 
 
 def get_user(session: Session, email: str) -> UserInDb | None:
