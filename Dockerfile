@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.14-alpine
 
 # Install the musescore package
 RUN apk add --no-cache musescore nodejs npm
