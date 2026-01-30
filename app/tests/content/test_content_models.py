@@ -3,9 +3,9 @@ from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.content.models import MsczContent
-from app.content_base.models import ContentBase
-from app.static_content.models import StaticContent
+from app.models.content import MsczContent
+from app.models.content_base import ContentBase
+from app.models.static_content import StaticContent
 
 
 def test_create_mscz_content(session):

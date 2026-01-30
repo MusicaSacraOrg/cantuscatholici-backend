@@ -3,8 +3,8 @@ from sqlalchemy import func, select
 
 from app.common.deps.pagination import PaginationParamsDep
 from app.database import DbSessionDep
-from app.user_role.models import UserRole
-from app.user_role.schema import UserRoleList
+from app.models.user_role import UserRole
+from app.schemas.user_role import UserRoleList
 
 user_role_router = APIRouter(
     prefix="/user_role",

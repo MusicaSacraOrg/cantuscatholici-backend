@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.user_role.models import UserRole
+from app.models.user_role import UserRole
 
 
 def test_create_user_role(session):

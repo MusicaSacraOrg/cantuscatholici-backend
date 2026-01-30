@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.tag.models import Tag
-from app.tag_category.models import TagCategory
+from app.models.tag import Tag
+from app.models.tag_category import TagCategory
 
 
 def test_dummy(

@@ -11,16 +11,16 @@ from sqlalchemy.orm import Session
 
 from app.config import auth_settings
 from app.database import DbSessionDep
-from app.person.schema import PersonInDb
-from app.user.auth import get_password_hash, verify_password
-from app.user.exceptions import (
+from app.schemas.person import PersonInDb
+from app.services.auth import get_password_hash, verify_password
+from app.exceptions.user import (
     EmailTakenException,
     InvalidCredentialsException,
     MobileTakenException,
 )
-from app.user.models import User
-from app.user.schema import UserInDb
-from app.user_role.models import UserRole
+from app.models.user import User
+from app.schemas.user import UserInDb
+from app.models.user_role import UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

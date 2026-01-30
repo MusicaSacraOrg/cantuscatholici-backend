@@ -3,7 +3,7 @@ from typing import ClassVar
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.content_base.models import ContentBase
+from app.models.content_base import ContentBase
 
 
 class StaticContent(ContentBase):

@@ -13,8 +13,8 @@ from pydantic import (
 from pydantic.alias_generators import to_camel, to_snake
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
-from app.person.schema import PersonCreate, PersonInDb
-from app.user_role.service import PredefinedUserRoles
+from app.schemas.person import PersonCreate, PersonInDb
+from app.services.user_role import PredefinedUserRoles
 
 SPECIAL_CHARS = {
     "$",

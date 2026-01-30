@@ -2,8 +2,8 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.calendar.models import CalendarEntry
-from app.person.models import Person
-from app.song.models import Song
+from app.models.person import Person
+from app.models.song import Song
 
 
 def test_create_calendar_entry(session):
