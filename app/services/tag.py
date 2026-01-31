@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from app.common.deps.pagination import PaginationParams
 from app.common.exceptions import AlreadyExistsError, NotFoundError
 from app.db.tag import (
     db_get_tags,
@@ -13,11 +14,26 @@ from app.db.tag import (
 from app.models.tag import Tag
 from app.schemas.tag import Tag as TagSchema
 from app.schemas.tag import TagCreate as TagCreateSchema
+from app.common.schemas.pagination import Paginated
 
 
-def get_tags(db: Session) -> list[Tag]:
-    return db_get_tags(db)
+def get_tags(db: Session, pagination: PaginationParams) -> Paginated[Tag]:
+    total, items = db_get_tags(
+        db,
+        limit=pagination.limit,
+        offset=pagination.offset,
+        order=pagination.order,
+        order_by=pagination.order_by,
+    )
 
+    return Paginated(
+        total=total,
+        limit=pagination.limit,
+        offset=pagination.offset,
+        order=pagination.order,
+        order_by=pagination.order_by,
+        items=items,
+    )
 
 def get_tag_by_id(tag_id: int, db: Session) -> Tag:
     tag = db_get_tag_by_id(tag_id, db)
@@ -28,8 +44,23 @@ def get_tag_by_id(tag_id: int, db: Session) -> Tag:
     return tag
 
 
-def get_tags_by_category(tag_category_id: int, db: Session) -> list[Tag]:
-    return db_get_tags_by_category(tag_category_id, db)
+def get_tags_by_category(tag_category_id: int, db: Session, pagination: PaginationParams) -> Paginated[Tag]:
+    total, items = db_get_tags_by_category(
+        tag_category_id,
+        db,
+        limit=pagination.limit,
+        offset=pagination.offset,
+        order=pagination.order,
+        order_by=pagination.order_by,
+    )
+    return Paginated(
+        total=total,
+        limit=pagination.limit,
+        offset=pagination.offset,
+        order=pagination.order,
+        order_by=pagination.order_by,
+        items=items,
+    )
 
 
 def create_tag(tag: TagCreateSchema, db: Session) -> Tag:

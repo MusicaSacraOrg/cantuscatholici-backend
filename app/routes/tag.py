@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from typing import List
+
+from ..common.deps.pagination import PaginationParams, PaginationParamsDep
+from ..common.schemas.pagination import Paginated
 from ..schemas.tag import Tag as TagSchema
 from ..schemas.tag import TagCreate as TagCreateSchema
 
@@ -21,9 +24,9 @@ tag_router = APIRouter(
 )
 
 
-@tag_router.get("/", response_model=List[TagSchema])
-async def get_tags_endpoint(db: DbSessionDep):
-    return {"items": get_tags(db)}
+@tag_router.get("/", response_model=Paginated[TagSchema])
+async def get_tags_endpoint(db: DbSessionDep, pagination: PaginationParamsDep):
+    return {"items": get_tags(db, pagination)}
 
 
 @tag_router.get("/{tag_id}", response_model=TagSchema)
