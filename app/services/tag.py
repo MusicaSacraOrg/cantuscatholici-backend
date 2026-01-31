@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from app.common.exceptions import AlreadyExistsError, NotFoundError
 from app.db.tag import (
     db_get_tags,
     db_get_tag_by_id,
@@ -22,8 +23,7 @@ def get_tag_by_id(tag_id: int, db: Session) -> Tag:
     tag = db_get_tag_by_id(tag_id, db)
 
     if not tag:
-        # TODO error
-        pass
+        raise NotFoundError('Tag')
 
     return tag
 
@@ -41,17 +41,15 @@ def create_tag(tag: TagCreateSchema, db: Session) -> Tag:
     try:
         return db_create_tag(new_tag, db)
     except IntegrityError as e:
-        if 'unique constraint' in str(e.orig).lower():
-            # TODO error
-            pass
+        if 'unique' in str(e.orig).lower():
+            raise AlreadyExistsError('Tag')
         raise
 
 
 def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> Tag:
     existing_tag = db_get_tag_by_id(tag_id, db)
-    if tag is None:
-        # TODO error
-        pass
+    if existing_tag is None:
+        raise NotFoundError('Tag')
 
     existing_tag.name = tag.name
     existing_tag.category_id = tag.category_id
@@ -59,16 +57,14 @@ def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> Tag:
     try:
         return db_update_tag(existing_tag, db)
     except IntegrityError as e:
-        if 'unique constraint' in str(e.orig).lower():
-            # TODO error
-            pass
+        if 'unique' in str(e.orig).lower():
+            raise AlreadyExistsError('Tag')
         raise
 
 
 def delete_tag(tag_id: int, db: Session) -> Tag:
     existing_tag = db_get_tag_by_id(tag_id, db)
     if existing_tag is None:
-        # TODO error
-        pass
+        raise NotFoundError('Tag')
 
     return db_delete_tag(existing_tag, db)
