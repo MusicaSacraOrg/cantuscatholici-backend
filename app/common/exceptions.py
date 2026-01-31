@@ -27,3 +27,11 @@ class AlreadyExistsError(DomainError):
 
     def __init__(self, entity: str, *, extra: dict | None = None):
         super().__init__(f"{entity} already exists", extra=extra)
+
+
+class ForbiddenException(DomainError):
+    code: str = "forbidden"
+    http_status: int = status.HTTP_403_FORBIDDEN
+
+    def __init__(self):
+        super().__init__("Access forbidden")
