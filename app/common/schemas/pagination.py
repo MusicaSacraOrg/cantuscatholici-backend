@@ -1,4 +1,4 @@
-from typing import TypeVar, Literal
+from typing import Literal, TypeVar
 
 from pydantic import BaseModel, NonNegativeInt, PositiveInt
 

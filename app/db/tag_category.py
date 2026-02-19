@@ -1,5 +1,5 @@
+from sqlalchemy import asc, desc, func, select
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func, asc, desc
 
 from ..models.tag_category import TagCategory
 
@@ -8,9 +8,16 @@ ALLOWED_ORDER_FIELDS = {
     "name": TagCategory.name,
 }
 
-def db_get_tags_categories(db: Session, *, limit: int, offset: int, order_by: str | None = None, order: str = "asc",) -> tuple[int, list[TagCategory]]:
+def db_get_tags_categories(
+        db: Session,
+        *,
+        limit: int,
+        offset: int,
+        order_by: str | None = None,
+        order: str = "asc",
+) -> tuple[int, list[TagCategory]]:
     total = db.execute(
-        select(func.count()).select_from(TagCategory)
+        select(func.count()).select_from(TagCategory),
     ).scalar_one()
 
     stmt = select(TagCategory)
@@ -25,14 +32,14 @@ def db_get_tags_categories(db: Session, *, limit: int, offset: int, order_by: st
     stmt = stmt.offset(offset)
 
     result = db.execute(stmt)
-    items = result.scalars().all()
+    items: list[TagCategory] = list(result.scalars().all())
 
     return total, items
 
 
 def db_get_tag_category(tag_category_id: int, db: Session):
     result = db.execute(
-        select(TagCategory).where(TagCategory.id == tag_category_id)
+        select(TagCategory).where(TagCategory.id == tag_category_id),
     )
 
     return result.scalars().first()

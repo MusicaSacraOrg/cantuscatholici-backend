@@ -7,8 +7,8 @@ from pydantic.types import SecretStr
 
 from app.config import auth_settings
 from app.database import DbSessionDep
-from app.services.auth import create_access_token
 from app.schemas.user import Token, UserCreate, UserInDb, UserRead
+from app.services.auth import create_access_token
 from app.services.user import authenticate_user, create_user, get_current_user
 
 user_router = APIRouter(

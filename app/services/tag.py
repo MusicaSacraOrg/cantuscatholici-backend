@@ -1,20 +1,20 @@
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from app.common.deps.pagination import PaginationParams
 from app.common.exceptions import AlreadyExistsError, NotFoundError
+from app.common.schemas.pagination import Paginated
 from app.db.tag import (
-    db_get_tags,
-    db_get_tag_by_id,
     db_create_tag,
-    db_update_tag,
     db_delete_tag,
+    db_get_tag_by_id,
+    db_get_tags,
     db_get_tags_by_category,
+    db_update_tag,
 )
 from app.models.tag import Tag
 from app.schemas.tag import Tag as TagSchema
 from app.schemas.tag import TagCreate as TagCreateSchema
-from app.common.schemas.pagination import Paginated
 
 
 def get_tags(db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
@@ -44,7 +44,11 @@ def get_tag_by_id(tag_id: int, db: Session) -> TagSchema:
     return tag
 
 
-def get_tags_by_category(tag_category_id: int, db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
+def get_tags_by_category(
+        tag_category_id: int,
+        db: Session,
+        pagination: PaginationParams,
+) -> Paginated[TagSchema]:
     total, items = db_get_tags_by_category(
         tag_category_id,
         db,
@@ -73,14 +77,14 @@ def create_tag(tag: TagCreateSchema, db: Session) -> TagSchema:
         return db_create_tag(new_tag, db)
     except IntegrityError as e:
         if 'unique' in str(e.orig).lower():
-            raise AlreadyExistsError('Tag')
+            raise AlreadyExistsError('Tag') from e
         raise
 
 
 def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> TagSchema:
     existing_tag = db_get_tag_by_id(tag_id, db)
     if existing_tag is None:
-        raise NotFoundError('Tag')
+        raise NotFoundError('Tag') from None
 
     existing_tag.name = tag.name
     existing_tag.category_id = tag.category_id
@@ -89,13 +93,13 @@ def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> TagSchema:
         return db_update_tag(existing_tag, db)
     except IntegrityError as e:
         if 'unique' in str(e.orig).lower():
-            raise AlreadyExistsError('Tag')
+            raise AlreadyExistsError('Tag') from e
         raise
 
 
 def delete_tag(tag_id: int, db: Session) -> TagSchema:
     existing_tag = db_get_tag_by_id(tag_id, db)
     if existing_tag is None:
-        raise NotFoundError('Tag')
+        raise NotFoundError('Tag') from None
 
     return db_delete_tag(existing_tag, db)

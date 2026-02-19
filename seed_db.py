@@ -1,10 +1,9 @@
 from pydantic import SecretStr
 
 from app.database import SessionLocal
+from app.user.auth import get_password_hash
 from app.user.models import User
 from app.user_role.models import UserRole
-from app.user.auth import get_password_hash
-
 
 USERS_TO_CREATE = [
     {

@@ -5,9 +5,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 import app.models
-from app.routes.calendar import calendar_router
 from app.common.exceptions import DomainError
 from app.database import SessionLocal
+from app.routes.calendar import calendar_router
 from app.routes.review import review_router
 from app.routes.song import song_router
 from app.routes.static_content import static_content_router
