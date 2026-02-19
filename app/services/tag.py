@@ -17,7 +17,7 @@ from app.schemas.tag import TagCreate as TagCreateSchema
 from app.common.schemas.pagination import Paginated
 
 
-def get_tags(db: Session, pagination: PaginationParams) -> Paginated[Tag]:
+def get_tags(db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
     total, items = db_get_tags(
         db,
         limit=pagination.limit,
@@ -35,7 +35,7 @@ def get_tags(db: Session, pagination: PaginationParams) -> Paginated[Tag]:
         items=items,
     )
 
-def get_tag_by_id(tag_id: int, db: Session) -> Tag:
+def get_tag_by_id(tag_id: int, db: Session) -> TagSchema:
     tag = db_get_tag_by_id(tag_id, db)
 
     if not tag:
@@ -44,7 +44,7 @@ def get_tag_by_id(tag_id: int, db: Session) -> Tag:
     return tag
 
 
-def get_tags_by_category(tag_category_id: int, db: Session, pagination: PaginationParams) -> Paginated[Tag]:
+def get_tags_by_category(tag_category_id: int, db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
     total, items = db_get_tags_by_category(
         tag_category_id,
         db,
@@ -63,7 +63,7 @@ def get_tags_by_category(tag_category_id: int, db: Session, pagination: Paginati
     )
 
 
-def create_tag(tag: TagCreateSchema, db: Session) -> Tag:
+def create_tag(tag: TagCreateSchema, db: Session) -> TagSchema:
     new_tag = Tag(
         name=tag.name,
         category_id=tag.category_id,
@@ -77,7 +77,7 @@ def create_tag(tag: TagCreateSchema, db: Session) -> Tag:
         raise
 
 
-def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> Tag:
+def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> TagSchema:
     existing_tag = db_get_tag_by_id(tag_id, db)
     if existing_tag is None:
         raise NotFoundError('Tag')
@@ -93,7 +93,7 @@ def update_tag(tag_id: int, tag: TagCreateSchema, db: Session) -> Tag:
         raise
 
 
-def delete_tag(tag_id: int, db: Session) -> Tag:
+def delete_tag(tag_id: int, db: Session) -> TagSchema:
     existing_tag = db_get_tag_by_id(tag_id, db)
     if existing_tag is None:
         raise NotFoundError('Tag')

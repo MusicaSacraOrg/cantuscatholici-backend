@@ -1,32 +1,44 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select, func, asc, desc
 
 from ..models.tag_category import TagCategory
-from ..schemas.tag_category import TagCategory as TagCategorySchema
 
+ALLOWED_ORDER_FIELDS = {
+    "id": TagCategory.id,
+    "name": TagCategory.name,
+}
 
-def db_get_tags_categories(db: Session):
-    tag_categories = db.query(TagCategory).all()
+def db_get_tags_categories(db: Session, *, limit: int, offset: int, order_by: str | None = None, order: str = "asc",) -> tuple[int, list[TagCategory]]:
+    total = db.execute(
+        select(func.count()).select_from(TagCategory)
+    ).scalar_one()
 
-    if not tag_categories:
-        return None
+    stmt = select(TagCategory)
 
-    return tag_categories
+    if order_by in ALLOWED_ORDER_FIELDS:
+        column = ALLOWED_ORDER_FIELDS[order_by]
+        stmt = stmt.order_by(asc(column) if order == "asc" else desc(column))
+
+    if limit is not None:
+        stmt = stmt.limit(limit)
+
+    stmt = stmt.offset(offset)
+
+    result = db.execute(stmt)
+    items = result.scalars().all()
+
+    return total, items
 
 
 def db_get_tag_category(tag_category_id: int, db: Session):
-    tag_category = db.query(TagCategory).filter(TagCategory.id == tag_category_id).first()
-
-    if not tag_category:
-        return None
-
-    return tag_category
-
-
-def db_create_tag_category(tag_category: TagCategorySchema, db: Session):
-    tag_category = TagCategory(
-        name=tag_category.name,
+    result = db.execute(
+        select(TagCategory).where(TagCategory.id == tag_category_id)
     )
 
+    return result.scalars().first()
+
+
+def db_create_tag_category(tag_category: TagCategory, db: Session):
     db.add(tag_category)
     db.commit()
     db.refresh(tag_category)
@@ -34,27 +46,15 @@ def db_create_tag_category(tag_category: TagCategorySchema, db: Session):
     return tag_category
 
 
-def db_update_tag_category(tag_category_id, tag_category: TagCategorySchema, db: Session):
-    existing_tag_category = db.query(TagCategory).filter(TagCategory.id == tag_category_id).first()
-
-    if not existing_tag_category:
-        return None
-
-    existing_tag_category.name = tag_category.name
-
+def db_update_tag_category(tag_category: TagCategory, db: Session):
     db.commit()
-    db.refresh(existing_tag_category)
+    db.refresh(tag_category)
 
-    return existing_tag_category
+    return tag_category
 
 
-def db_delete_tag_category(tag_category_id: int, db: Session):
-    tag_category = db.query(TagCategory).filter(TagCategory.id == tag_category_id).first()
-
-    if not tag_category:
-        return False
-
+def db_delete_tag_category(tag_category: TagCategory, db: Session):
     db.delete(tag_category)
     db.commit()
 
-    return True
+    return tag_category

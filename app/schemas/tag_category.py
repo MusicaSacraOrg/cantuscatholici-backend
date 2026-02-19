@@ -1,6 +1,13 @@
 from pydantic import BaseModel
 
 
-class TagCategory(BaseModel):
+class TagCategoryBase(BaseModel):
     name: str
-    # color: str
+
+
+class TagCategory(TagCategoryBase):
+    id: int
+
+
+class TagCategoryCreate(TagCategoryBase):
+    pass

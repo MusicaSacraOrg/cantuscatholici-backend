@@ -27,7 +27,7 @@ tag_router = APIRouter(
 
 @tag_router.get("/", response_model=Paginated[TagSchema])
 async def get_tags_endpoint(db: DbSessionDep, pagination: PaginationParamsDep):
-    return {"items": get_tags(db, pagination)}
+    return get_tags(db, pagination)
 
 
 @tag_router.get("/{tag_id}", response_model=TagSchema)
@@ -37,7 +37,7 @@ async def get_tag_by_id_endpoint(tag_id: int, db: DbSessionDep):
 
 @tag_router.get("/by-category/{category_tag_id}", response_model=List[TagSchema])
 async def get_tags_by_category_id_endpoint(category_tag_id: int, db: DbSessionDep):
-    return {"items": get_tags_by_category(category_tag_id, db)}
+    return get_tags_by_category(category_tag_id, db)
 
 
 @tag_router.post("/create", response_model=TagSchema)

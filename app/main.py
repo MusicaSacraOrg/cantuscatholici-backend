@@ -75,4 +75,4 @@ app.include_router(user_role_router)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello from cantus catholici!"}
+    return {"message": "Hello from Cantus Catholici!"}
