@@ -2,6 +2,7 @@ from sqlalchemy import asc, desc, func, select
 from sqlalchemy.orm import Session
 
 from ..models.tag_category import TagCategory
+from ..schemas.tag_category import TagCategory as TagCategorySchema
 
 ALLOWED_ORDER_FIELDS = {
     "id": TagCategory.id,
@@ -15,7 +16,7 @@ def db_get_tags_categories(
         offset: int,
         order_by: str | None = None,
         order: str = "asc",
-) -> tuple[int, list[TagCategory]]:
+) -> tuple[int, list[TagCategorySchema]]:
     total = db.execute(
         select(func.count()).select_from(TagCategory),
     ).scalar_one()
@@ -32,7 +33,7 @@ def db_get_tags_categories(
     stmt = stmt.offset(offset)
 
     result = db.execute(stmt)
-    items: list[TagCategory] = list(result.scalars().all())
+    items: list[TagCategorySchema] = list(result.scalars().all())
 
     return total, items
 

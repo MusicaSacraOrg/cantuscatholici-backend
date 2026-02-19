@@ -1,7 +1,6 @@
 from collections.abc import Callable
 
 from fastapi import Depends
-from sqlalchemy.sql.annotation import Annotated
 
 from ..common.exceptions import ForbiddenException
 from ..schemas.user import UserInDb
@@ -16,7 +15,7 @@ ROLE_RANK: dict[str, int] = {
 
 def required_role(min_role: str) -> Callable:
     async def role_dependency(
-        current_user: Annotated[UserInDb, Depends(get_current_user)],
+        current_user: UserInDb = Depends(get_current_user),  # noqa: B008
     ) -> UserInDb:
         user_rank = ROLE_RANK.get(current_user.role)
         required_rank = ROLE_RANK.get(min_role)

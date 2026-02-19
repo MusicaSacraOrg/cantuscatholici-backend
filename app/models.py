@@ -1,3 +1,3 @@
 # ruff: noqa: F401
 
-import app.calendar.models
+import app.models.calendar

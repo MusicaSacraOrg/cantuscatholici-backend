@@ -11,4 +11,4 @@ class Paginated[T](BaseModel):
     offset: NonNegativeInt
     order_by: str | None = None
     order: Literal["asc", "desc"] = "asc"
-    items: list[T]
+    items: list[T] | None

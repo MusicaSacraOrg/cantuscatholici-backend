@@ -20,7 +20,7 @@ from app.schemas.tag import TagCreate as TagCreateSchema
 def get_tags(db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
     total, items = db_get_tags(
         db,
-        limit=pagination.limit,
+        limit=pagination.limit or 100,
         offset=pagination.offset,
         order=pagination.order,
         order_by=pagination.order_by,
@@ -28,7 +28,7 @@ def get_tags(db: Session, pagination: PaginationParams) -> Paginated[TagSchema]:
 
     return Paginated(
         total=total,
-        limit=pagination.limit,
+        limit=pagination.limit or 100,
         offset=pagination.offset,
         order=pagination.order,
         order_by=pagination.order_by,
@@ -52,14 +52,14 @@ def get_tags_by_category(
     total, items = db_get_tags_by_category(
         tag_category_id,
         db,
-        limit=pagination.limit,
+        limit=pagination.limit or 100,
         offset=pagination.offset,
         order=pagination.order,
         order_by=pagination.order_by,
     )
     return Paginated(
         total=total,
-        limit=pagination.limit,
+        limit=pagination.limit or 100,
         offset=pagination.offset,
         order=pagination.order,
         order_by=pagination.order_by,

@@ -2,6 +2,7 @@ from sqlalchemy import Select, asc, desc, func, select
 from sqlalchemy.orm import Session
 
 from ..models.tag import Tag
+from ..schemas.tag import Tag as TagSchema
 
 ALLOWED_ORDER_FIELDS = {
     "id": Tag.id,
@@ -16,7 +17,7 @@ def db_get_tags(
         offset: int,
         order_by: str | None = None,
         order: str = "asc",
-) -> tuple[int, list[Tag]]:
+) -> tuple[int, list[TagSchema]]:
     total = db.execute(
         select(func.count()).select_from(Tag),
     ).scalar_one()
@@ -33,7 +34,7 @@ def db_get_tags(
     stmt = stmt.offset(offset)
 
     result = db.execute(stmt)
-    items: list[Tag] = list(result.scalars().all())
+    items: list[TagSchema] = list(result.scalars().all())
 
     return total, items
 
@@ -52,7 +53,8 @@ def db_get_tags_by_category(
         limit: int,
         offset: int,
         order: str = "asc",
-        order_by: str) -> tuple[int, list[Tag] | None]:
+        order_by: str | None = None,
+) -> tuple[int, list[TagSchema] | None]:
     total = db.execute(
         select(func.count()).select_from(Tag).where(Tag.category_id == tag_category_id),
     ).scalar_one()
@@ -69,7 +71,7 @@ def db_get_tags_by_category(
     stmt = stmt.offset(offset)
 
     result = db.execute(stmt)
-    items: list[Tag] = list(result.scalars().all())
+    items: list[TagSchema] = list(result.scalars().all())
 
     return total, items
 
