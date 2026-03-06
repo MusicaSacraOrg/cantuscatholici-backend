@@ -16,6 +16,7 @@ from app.static_content.router import static_content_router
 from app.tag.router import tag_router
 from app.tag_category.router import tag_category_router
 from app.user.router import user_router
+from app.user_content.router import user_content_router
 from app.user_role.router import user_role_router
 from app.user_role.service import ensure_all_exist
 
@@ -79,6 +80,7 @@ api_router.include_router(song_router)
 api_router.include_router(tag_router)
 api_router.include_router(tag_category_router)
 api_router.include_router(user_router)
+api_router.include_router(user_content_router)
 api_router.include_router(user_role_router)
 app.include_router(api_router)
 

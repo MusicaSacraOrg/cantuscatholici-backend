@@ -47,11 +47,16 @@ class UserContent(ContentBase):
         ForeignKey('users.id'), nullable=False)
     tag_id: Mapped[int | None] = mapped_column(
         ForeignKey('tags.id'), nullable=True)
+    song_id: Mapped[int | None] = mapped_column(
+        ForeignKey('songs.id'), nullable=True)
+    content_type: Mapped[str | None] = mapped_column(nullable=True)
     added_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
     )
+
+    added_by_user: Mapped["User"] = relationship("User", foreign_keys=[added_by_user_id])
 
     __mapper_args__: ClassVar = {
         "polymorphic_identity": "user_content",
