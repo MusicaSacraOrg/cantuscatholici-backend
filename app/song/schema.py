@@ -100,6 +100,42 @@ class SongDetail(BaseModel):
     related_song: RelatedSong | None = None
     added_at: str | None = None
     last_edit_at: str | None = None
+    has_lyrics: bool = False
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class LyricsPartItem(BaseModel):
+    part_type: str
+    lyrics: str
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class SongLyrics(BaseModel):
+    song_id: int
+    parts: list[LyricsPartItem] = []
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class LyricsUpdate(BaseModel):
+    parts: list[LyricsPartItem]
 
     model_config = ConfigDict(
         alias_generator=AliasGenerator(

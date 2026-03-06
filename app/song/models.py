@@ -52,6 +52,10 @@ class Song(ContentBase):
 
     tags: Mapped[list["Tag"]] = relationship("Tag", secondary=song_tags)
     author_person: Mapped["Person"] = relationship("Person", foreign_keys=[author])
+    lyrics_order: Mapped[list["SongOrder"]] = relationship(
+        "SongOrder", back_populates="song", order_by="SongOrder.order",
+        foreign_keys="SongOrder.song_id",
+    )
 
     __mapper_args__: ClassVar = {
         "polymorphic_identity": "songs",
@@ -62,19 +66,29 @@ class SongOrder(Base):
     __tablename__ = 'song_order'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    song_id: Mapped[int | None] = mapped_column(
+        ForeignKey('songs.id'), nullable=True)
     order: Mapped[int] = mapped_column(nullable=False)
     part_id: Mapped[int] = mapped_column(
         ForeignKey('song_parts.id'), nullable=False)
+
+    song: Mapped["Song"] = relationship(
+        "Song", back_populates="lyrics_order", foreign_keys=[song_id],
+    )
+    part: Mapped["SongPart"] = relationship("SongPart")
 
 
 class SongPart(Base):
     __tablename__ = 'song_parts'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    tag_id: Mapped[int] = mapped_column(
-        ForeignKey('tags.id'), nullable=False)
+    tag_id: Mapped[int | None] = mapped_column(
+        ForeignKey('tags.id'), nullable=True)
+    part_type: Mapped[str | None] = mapped_column(nullable=True)
     verses_id: Mapped[int | None] = mapped_column(
         ForeignKey('song_verses.id'), nullable=True)
+
+    verse: Mapped["SongVerse | None"] = relationship("SongVerse")
 
 
 class SongVerse(Base):

@@ -9,7 +9,7 @@ from app.common.deps.pagination import PaginationParams
 from app.person.models import Person
 from app.song.associations import song_tags
 from app.song.exceptions import SongNotFoundException, SongTitleTakenException
-from app.song.models import Song
+from app.song.models import Song, SongOrder, SongPart, SongVerse
 from app.tag.models import Tag
 from app.tag_category.models import TagCategory
 
@@ -138,6 +138,7 @@ def get_song_detail(session: Session, song_id: int) -> dict:
         .options(
             selectinload(Song.tags).selectinload(Tag.category),
             selectinload(Song.author_person),
+            selectinload(Song.lyrics_order),
         )
     )
     song = session.scalars(stmt).unique().first()
@@ -167,6 +168,8 @@ def get_song_detail(session: Session, song_id: int) -> dict:
         if related:
             related_song = {"id": related.id, "title": related.title}
 
+    has_lyrics = len(song.lyrics_order) > 0
+
     return {
         "id": song.id,
         "title": song.title,
@@ -177,6 +180,7 @@ def get_song_detail(session: Session, song_id: int) -> dict:
         "related_song": related_song,
         "added_at": song.added_at.isoformat() if song.added_at else None,
         "last_edit_at": song.last_edit_at.isoformat() if song.last_edit_at else None,
+        "has_lyrics": has_lyrics,
     }
 
 
@@ -240,4 +244,104 @@ def delete_song(session: Session, song_id: int) -> None:
         session.execute(
             sa_delete(song_tags).where(song_tags.c.song_id == song_id),
         )
+        _delete_lyrics(session, song_id)
         session.delete(song)
+
+
+def get_song_lyrics(session: Session, song_id: int) -> dict:
+    song = session.get(Song, song_id)
+    if song is None:
+        raise SongNotFoundException("Song not found")
+
+    stmt = (
+        select(SongOrder)
+        .where(SongOrder.song_id == song_id)
+        .options(
+            selectinload(SongOrder.part).selectinload(SongPart.verse),
+        )
+        .order_by(SongOrder.order)
+    )
+    orders = list(session.scalars(stmt).all())
+
+    parts = []
+    for order_entry in orders:
+        part = order_entry.part
+        if part is None:
+            continue
+        lyrics = part.verse.lyrics if part.verse else ""
+        parts.append({
+            "part_type": part.part_type or "",
+            "lyrics": lyrics,
+        })
+
+    return {"song_id": song_id, "parts": parts}
+
+
+def set_song_lyrics(
+    session: Session,
+    song_id: int,
+    parts: list[dict],
+) -> dict:
+    song = session.get(Song, song_id)
+    if song is None:
+        raise SongNotFoundException("Song not found")
+
+    _delete_lyrics(session, song_id)
+
+    for idx, part_data in enumerate(parts):
+        verse = SongVerse(
+            order=idx + 1,
+            lyrics=part_data.get("lyrics", ""),
+        )
+        session.add(verse)
+        session.flush()
+
+        song_part = SongPart(
+            part_type=part_data.get("part_type", "verse"),
+            verses_id=verse.id,
+        )
+        session.add(song_part)
+        session.flush()
+
+        song_order = SongOrder(
+            song_id=song_id,
+            order=idx + 1,
+            part_id=song_part.id,
+        )
+        session.add(song_order)
+
+    session.commit()
+    return get_song_lyrics(session, song_id)
+
+
+def _delete_lyrics(session: Session, song_id: int) -> None:
+    orders = list(
+        session.scalars(
+            select(SongOrder).where(SongOrder.song_id == song_id),
+        ).all()
+    )
+    part_ids = [o.part_id for o in orders]
+
+    if not orders:
+        return
+
+    verse_ids = []
+    if part_ids:
+        parts = list(
+            session.scalars(
+                select(SongPart).where(SongPart.id.in_(part_ids)),
+            ).all()
+        )
+        verse_ids = [p.verses_id for p in parts if p.verses_id is not None]
+
+    session.execute(
+        sa_delete(SongOrder).where(SongOrder.song_id == song_id),
+    )
+    if part_ids:
+        session.execute(
+            sa_delete(SongPart).where(SongPart.id.in_(part_ids)),
+        )
+    if verse_ids:
+        session.execute(
+            sa_delete(SongVerse).where(SongVerse.id.in_(verse_ids)),
+        )
