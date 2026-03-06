@@ -1,11 +1,16 @@
 from datetime import datetime
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from sqlalchemy import DateTime, ForeignKey, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.content_base.models import ContentBase
 from app.database import Base
+from app.song.associations import song_tags
+
+if TYPE_CHECKING:
+    from app.person.models import Person
+    from app.tag.models import Tag
 
 
 class Song(ContentBase):
@@ -44,6 +49,9 @@ class Song(ContentBase):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    tags: Mapped[list["Tag"]] = relationship("Tag", secondary=song_tags)
+    author_person: Mapped["Person"] = relationship("Person", foreign_keys=[author])
 
     __mapper_args__: ClassVar = {
         "polymorphic_identity": "songs",
