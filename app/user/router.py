@@ -8,8 +8,24 @@ from pydantic.types import SecretStr
 from app.config import auth_settings
 from app.database import DbSessionDep
 from app.user.auth import create_access_token
-from app.user.schema import Token, UserCreate, UserInDb, UserRead
-from app.user.service import authenticate_user, create_user, get_current_user
+from app.user.schema import (
+    PasswordChange,
+    ProfileUpdateResponse,
+    Token,
+    UserCreate,
+    UserInDb,
+    UserProfileUpdate,
+    UserRead,
+)
+from app.user.service import (
+    authenticate_user,
+    change_user_password,
+    create_user,
+    delete_user,
+    get_current_user,
+    get_user_by_id,
+    update_user_profile,
+)
 
 user_router = APIRouter(
     prefix="/user",
@@ -62,10 +78,48 @@ async def register(
     return Token(access_token=access_token, token_type="bearer")
 
 
-# / token -> User
+@user_router.put("/profile", response_model=ProfileUpdateResponse)
+def update_profile(
+    session: DbSessionDep,
+    body: UserProfileUpdate,
+    current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    user = update_user_profile(
+        session,
+        current_user.id,
+        body.name,
+        body.surname,
+        body.email,
+        body.mobile,
+        body.description,
+    )
+    updated = get_user_by_id(session, user.id)
+    access_token = create_access_token(data={"sub": updated.email})
+    return {
+        "user": updated,
+        "token": Token(access_token=access_token, token_type="bearer"),
+    }
 
-# /login email, password -> token
 
-# /register email, password -> token
+@user_router.put("/password", status_code=204)
+def change_password(
+    session: DbSessionDep,
+    body: PasswordChange,
+    current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    change_user_password(
+        session, current_user.id, body.old_password, body.new_password
+    )
 
-# /renew token -> token
+
+@user_router.delete("/", status_code=204)
+def delete_account(
+    session: DbSessionDep,
+    current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    delete_user(session, current_user.id)
+
+
+@user_router.get("/{user_id}", response_model=UserRead)
+def get_user_detail(session: DbSessionDep, user_id: int):
+    return get_user_by_id(session, user_id)

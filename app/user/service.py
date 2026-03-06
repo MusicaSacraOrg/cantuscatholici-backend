@@ -17,6 +17,8 @@ from app.user.exceptions import (
     EmailTakenException,
     InvalidCredentialsException,
     MobileTakenException,
+    UserNotFoundException,
+    WrongPasswordException,
 )
 from app.user.models import User
 from app.user.schema import UserInDb
@@ -122,3 +124,87 @@ def create_user(
         raise
 
     return user
+
+
+def get_user_by_id(session: Session, user_id: int) -> UserInDb:
+    stmt = (
+        select(User, UserRole.role).join(User.role).where(User.id == user_id).limit(1)
+    )
+    row = session.execute(stmt).first()
+    if not row:
+        raise UserNotFoundException("User not found")
+
+    user, role_str = row._tuple()
+
+    person_part = PersonInDb.model_validate(user, from_attributes=True).model_dump()
+
+    return UserInDb.model_validate(
+        {
+            **person_part,
+            "email": user.email,
+            "mobile": user.mobile,
+            "role": role_str,
+            "hashed_password": user.hashed_password,
+            "registered_at": user.registered_at,
+        },
+    )
+
+
+def update_user_profile(
+    session: Session,
+    user_id: int,
+    name: str,
+    surname: str,
+    email: str,
+    mobile: str | None,
+    description: str | None,
+) -> User:
+    user = session.get(User, user_id)
+    if not user:
+        raise UserNotFoundException("User not found")
+
+    user.name = name
+    user.surname = surname
+    user.email = email
+    user.mobile = mobile
+    user.description = description
+
+    try:
+        with session.begin():
+            session.add(user)
+    except IntegrityError as e:
+        if "email" in str(e.orig).lower():
+            raise EmailTakenException("Email already in use") from e
+        if "mobile" in str(e.orig).lower():
+            raise MobileTakenException("Mobile number already in use") from e
+        raise
+
+    session.refresh(user)
+    return user
+
+
+def change_user_password(
+    session: Session,
+    user_id: int,
+    old_password: SecretStr,
+    new_password: SecretStr,
+) -> None:
+    user = session.get(User, user_id)
+    if not user:
+        raise UserNotFoundException("User not found")
+
+    if not verify_password(old_password, SecretStr(user.hashed_password)):
+        raise WrongPasswordException("Wrong password")
+
+    user.hashed_password = get_password_hash(new_password)
+    with session.begin():
+        session.add(user)
+
+
+def delete_user(session: Session, user_id: int) -> None:
+    user = session.get(User, user_id)
+    if not user:
+        raise UserNotFoundException("User not found")
+
+    with session.begin():
+        session.delete(user)

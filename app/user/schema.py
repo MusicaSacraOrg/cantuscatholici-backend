@@ -103,3 +103,42 @@ class UserRead(PersonInDb, UserBase):
 class UserInDb(PersonInDb, UserBase):
     hashed_password: SecretStr
     registered_at: datetime
+
+
+class UserProfileUpdate(BaseModel):
+    name: str
+    surname: str
+    email: EmailStr
+    mobile: PhoneNumber | None = Field(default=None)
+    description: str | None = Field(default=None)
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class PasswordChange(BaseModel):
+    old_password: SecretStr
+    new_password: Annotated[SecretStr, AfterValidator(validate_password)]
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class ProfileUpdateResponse(BaseModel):
+    user: UserRead
+    token: Token
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
