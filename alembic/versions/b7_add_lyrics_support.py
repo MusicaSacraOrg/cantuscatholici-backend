@@ -34,6 +34,12 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Remove lyrics support columns."""
+    # Delete lyrics-related rows (song_order references song_parts, so delete order first)
+    op.execute(
+        "DELETE FROM song_order WHERE part_id IN "
+        "(SELECT id FROM song_parts WHERE tag_id IS NULL)"
+    )
+    op.execute("DELETE FROM song_parts WHERE tag_id IS NULL")
     op.alter_column("song_parts", "tag_id", existing_type=sa.Integer(), nullable=False)
     op.drop_column("song_parts", "part_type")
     op.drop_column("song_order", "song_id")
