@@ -111,6 +111,7 @@ class SongMr(Base):
         ForeignKey('users.id'), nullable=False)
     comments: Mapped[int | None] = mapped_column(
         ForeignKey('review_comments.id'), nullable=True)
+    status: Mapped[str] = mapped_column(nullable=False, server_default="open")
     closed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=True,

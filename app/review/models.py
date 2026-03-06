@@ -10,6 +10,8 @@ class ReviewComment(Base):
     __tablename__ = 'review_comments'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    review_id: Mapped[int | None] = mapped_column(
+        ForeignKey('song_mr.id'), nullable=True)
     commenter_id: Mapped[int] = mapped_column(
         ForeignKey('users.id'), nullable=False)
     content: Mapped[str] = mapped_column(nullable=False)

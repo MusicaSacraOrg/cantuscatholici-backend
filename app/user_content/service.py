@@ -1,6 +1,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
+from app.review.service import create_review
 from app.user.models import UserContent
 from app.user_content.exceptions import (
     UserContentForbiddenException,
@@ -71,6 +72,15 @@ def create_user_content(
     )
     session.add(uc)
     session.commit()
+
+    # Auto-create review for moderation
+    create_review(
+        session,
+        reviewable_id=uc.id,
+        user_id=user_id,
+        redactor_id=user_id,  # default to self, redactor can reassign
+    )
+
     session.refresh(uc, attribute_names=["added_by_user"])
     return _uc_to_dict(uc)
 
