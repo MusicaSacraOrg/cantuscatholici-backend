@@ -5,16 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 import app.models
-from app.calendar.router import calendar_router
 from app.common.exceptions import DomainError
 from app.database import SessionLocal
-from app.review.router import review_router
-from app.song.router import song_router
-from app.static_content.router import static_content_router
-from app.tag.router import tag_router
-from app.user.router import user_router
-from app.user_role.router import user_role_router
-from app.user_role.service import ensure_all_exist
+from app.routes.calendar import calendar_router
+from app.routes.review import review_router
+from app.routes.song import song_router
+from app.routes.static_content import static_content_router
+from app.routes.tag import tag_router
+from app.routes.user import user_router
+from app.routes.user_role import user_role_router
+from app.services.user_role import ensure_all_exist
 
 
 @asynccontextmanager
@@ -75,4 +75,4 @@ app.include_router(user_role_router)
 
 @app.get("/")
 async def root():
-    return {"message": "Hello from cantus catholici!"}
+    return {"message": "Hello from Cantus Catholici!"}

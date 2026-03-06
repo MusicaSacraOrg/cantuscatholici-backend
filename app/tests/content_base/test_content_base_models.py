@@ -1,4 +1,4 @@
-from app.content_base.models import ContentBase
+from app.models.content_base import ContentBase
 
 
 def test_create_content_base(session):

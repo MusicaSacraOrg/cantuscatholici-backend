@@ -1,4 +1,4 @@
-from app.tag_category.models import TagCategory
+from app.models.tag_category import TagCategory
 
 
 def test_create_tag_category(session):

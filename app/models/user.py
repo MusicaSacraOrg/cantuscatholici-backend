@@ -4,11 +4,11 @@ from typing import TYPE_CHECKING, ClassVar
 from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.content_base.models import ContentBase
-from app.person.models import Person
+from app.models.content_base import ContentBase
+from app.models.person import Person
 
 if TYPE_CHECKING:
-    from app.user_role.models import UserRole
+    from app.models.user_role import UserRole
 
 
 class User(Person):

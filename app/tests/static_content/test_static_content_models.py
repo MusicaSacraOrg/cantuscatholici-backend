@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.static_content.models import StaticContent
+from app.models.static_content import StaticContent
 
 
 def test_dummy(testclient):

@@ -3,15 +3,15 @@ from datetime import datetime
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.content.models import MsczContent
-from app.content_base.models import ContentBase
-from app.person.models import Person
-from app.song.models import Song, SongOrder, SongPart
-from app.static_content.models import StaticContent
-from app.tag.models import Tag
-from app.tag_category.models import TagCategory
-from app.user.models import User, UserContent
-from app.user_role.models import UserRole
+from app.models.content import MsczContent
+from app.models.content_base import ContentBase
+from app.models.person import Person
+from app.models.song import Song, SongOrder, SongPart
+from app.models.static_content import StaticContent
+from app.models.tag import Tag
+from app.models.tag_category import TagCategory
+from app.models.user import User, UserContent
+from app.models.user_role import UserRole
 
 
 @pytest.fixture

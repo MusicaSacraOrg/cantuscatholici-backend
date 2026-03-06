@@ -4,8 +4,8 @@ from typing import ClassVar
 from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.content_base.models import ContentBase
 from app.database import Base
+from app.models.content_base import ContentBase
 
 
 class Song(ContentBase):

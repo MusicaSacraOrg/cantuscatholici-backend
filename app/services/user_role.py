@@ -2,7 +2,7 @@ from enum import StrEnum
 
 from sqlalchemy.orm import Session
 
-from app.user_role.models import UserRole
+from app.models.user_role import UserRole
 
 
 class PredefinedUserRoles(StrEnum):

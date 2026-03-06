@@ -4,7 +4,7 @@ from typing import ClassVar
 from sqlalchemy import DateTime, ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.person.models import Person
+from app.models.person import Person
 
 
 class Author(Person):

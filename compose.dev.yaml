@@ -1,0 +1,99 @@
+services:
+  cantuscatholici-api:
+    image: '${DOCKER_IMAGE?Variable not set}:${TAG-latest}'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_USER=cantuscatholici
+      - POSTGRES_DB=cantuscatholici
+      - POSTGRES_PORT=5432
+      - LOG_DB_ENGINE_ECHO=${LOG_DB_ENGINE_ECHO?Variable not set}
+      - APP_STATIC_CONTENT_PREFIX=${APP_STATIC_CONTENT_PREFIX?Variable not set}
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY?Variable not set}
+    ports:
+      - "8000:8000"
+    command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
+    volumes:
+      - ./app:/app/app:rw
+      - cantuscatholici-static-content:${APP_STATIC_CONTENT_PREFIX?Variable not set}
+    develop:
+      watch:
+        - action: rebuild
+          path: Dockerfile
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: compose.yaml
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+
+  alembic:
+    image: '${DOCKER_IMAGE?Variable not set}:${TAG-latest}'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_USER=cantuscatholici
+      - POSTGRES_DB=cantuscatholici
+      - POSTGRES_PORT=5432
+      - LOG_DB_ENGINE_ECHO=${LOG_DB_ENGINE_ECHO?Variable not set}
+      - APP_STATIC_CONTENT_PREFIX=${APP_STATIC_CONTENT_PREFIX?Variable not set}
+      - AUTH_SECRET_KEY=${AUTH_SECRET_KEY?Variable not set}
+    command: ["alembic", "upgrade", "head"]
+    volumes:
+      - ./app:/app/app:rw
+      - cantuscatholici-static-content:${APP_STATIC_CONTENT_PREFIX?Variable not set}
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  seed:
+    image: '${DOCKER_IMAGE?Variable not set}:${TAG-latest}'
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: [ "python", "seed_db.py" ]
+    volumes:
+      - ./seed_db.py:/app/seed_db.py:rw
+      - cantuscatholici-static-content:${APP_STATIC_CONTENT_PREFIX?Variable not set}
+    depends_on:
+      alembic:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=cantuscatholici
+      - POSTGRES_DB=cantuscatholici
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_PORT=5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - cantuscatholici-data:/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cantuscatholici -d cantuscatholici"]
+      interval: 5s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+volumes:
+  cantuscatholici-data:
+  cantuscatholici-static-content:

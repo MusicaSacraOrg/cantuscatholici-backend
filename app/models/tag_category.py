@@ -8,5 +8,3 @@ class TagCategory(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(nullable=False)
-    # TODO: Implement Color class or implement constraint for color format
-    color: Mapped[str] = mapped_column(nullable=False)

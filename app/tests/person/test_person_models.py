@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.person.models import Person
-from app.static_content.models import StaticContent
+from app.models.person import Person
+from app.models.static_content import StaticContent
 
 
 def test_create_person(session):
