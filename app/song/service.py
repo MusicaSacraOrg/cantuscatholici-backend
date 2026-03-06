@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.common.deps.pagination import PaginationParams
 from app.person.models import Person
+from app.content.models import MsczContent
 from app.song.associations import song_tags
 from app.song.exceptions import SongNotFoundException, SongTitleTakenException
 from app.song.models import Song, SongOrder, SongPart, SongVerse
@@ -170,6 +171,18 @@ def get_song_detail(session: Session, song_id: int) -> dict:
 
     has_lyrics = len(song.lyrics_order) > 0
 
+    mscz_content = None
+    if song.mscz_id:
+        mscz = session.get(MsczContent, song.mscz_id)
+        if mscz:
+            mscz_content = {
+                "id": mscz.id,
+                "svg_url": f"/api/static_content/{mscz.c_svg_file_id}",
+                "pdf_url": f"/api/static_content/{mscz.pdf_file_id}",
+                "mscz_url": f"/api/static_content/{mscz.c_mscz_file_id}",
+                "mp3_url": f"/api/static_content/{mscz.mp3_file_id}" if mscz.mp3_file_id else None,
+            }
+
     return {
         "id": song.id,
         "title": song.title,
@@ -181,6 +194,7 @@ def get_song_detail(session: Session, song_id: int) -> dict:
         "added_at": song.added_at.isoformat() if song.added_at else None,
         "last_edit_at": song.last_edit_at.isoformat() if song.last_edit_at else None,
         "has_lyrics": has_lyrics,
+        "mscz_content": mscz_content,
     }
 
 
@@ -246,6 +260,15 @@ def delete_song(session: Session, song_id: int) -> None:
         )
         _delete_lyrics(session, song_id)
         session.delete(song)
+
+
+def set_song_mscz(session: Session, song_id: int, mscz_id: int) -> dict:
+    song = session.get(Song, song_id)
+    if song is None:
+        raise SongNotFoundException("Song not found")
+    song.mscz_id = mscz_id
+    session.commit()
+    return get_song_detail(session, song_id)
 
 
 def get_song_lyrics(session: Session, song_id: int) -> dict:

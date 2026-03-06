@@ -90,6 +90,21 @@ class SongUpdate(BaseModel):
     )
 
 
+class MsczContentItem(BaseModel):
+    id: int
+    svg_url: str | None = None
+    pdf_url: str | None = None
+    mscz_url: str | None = None
+    mp3_url: str | None = None
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
 class SongDetail(BaseModel):
     id: int
     title: str
@@ -101,6 +116,7 @@ class SongDetail(BaseModel):
     added_at: str | None = None
     last_edit_at: str | None = None
     has_lyrics: bool = False
+    mscz_content: MsczContentItem | None = None
 
     model_config = ConfigDict(
         alias_generator=AliasGenerator(

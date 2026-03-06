@@ -7,6 +7,7 @@ from starlette.responses import JSONResponse
 import app.models
 from app.calendar.router import calendar_router
 from app.common.exceptions import DomainError
+from app.content.router import content_router
 from app.database import SessionLocal
 from app.person.router import person_router
 from app.review.router import review_router
@@ -70,6 +71,7 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(calendar_router)
+api_router.include_router(content_router)
 api_router.include_router(person_router)
 api_router.include_router(static_content_router)
 api_router.include_router(review_router)

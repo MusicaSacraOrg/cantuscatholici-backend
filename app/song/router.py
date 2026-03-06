@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, Query
 from app.common.deps.pagination import PaginationParamsDep
 from app.database import DbSessionDep
 from app.song import service
+from pydantic import BaseModel
+
 from app.song.schema import (
     LyricsUpdate,
     SongCreate,
@@ -97,3 +99,17 @@ def set_song_lyrics(
 ):
     parts = [{"part_type": p.part_type, "lyrics": p.lyrics} for p in body.parts]
     return service.set_song_lyrics(session, song_id, parts)
+
+
+class MsczAssociation(BaseModel):
+    mscz_id: int
+
+
+@song_router.put("/{song_id}/mscz", response_model=SongDetail)
+def set_song_mscz(
+    session: DbSessionDep,
+    song_id: int,
+    body: MsczAssociation,
+    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    return service.set_song_mscz(session, song_id, body.mscz_id)
