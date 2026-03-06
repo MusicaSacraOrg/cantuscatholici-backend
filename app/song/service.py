@@ -72,15 +72,44 @@ def get_songs(
 
     if search_query:
         # Fuzzy search: load all matching candidates, then filter in Python
-        all_songs = list(session.scalars(stmt).unique().all())
+        all_songs = list(
+            session.scalars(
+                stmt.options(
+                    selectinload(Song.lyrics_order)
+                    .selectinload(SongOrder.part)
+                    .selectinload(SongPart.verse),
+                ),
+            ).unique().all()
+        )
         normalized_query = _normalize(search_query)
 
         scored = []
         for song in all_songs:
+            # Title score (highest weight)
             title_score = fuzz.partial_ratio(
                 normalized_query, _normalize(song.title),
             )
-            score = title_score
+
+            # Author name score
+            author_score = 0
+            if song.author_person:
+                author_name = f"{song.author_person.name} {song.author_person.surname}"
+                author_score = fuzz.partial_ratio(
+                    normalized_query, _normalize(author_name),
+                )
+
+            # Lyrics score (lower weight)
+            lyrics_score = 0
+            for order_entry in song.lyrics_order:
+                if order_entry.part and order_entry.part.verse:
+                    s = fuzz.partial_ratio(
+                        normalized_query,
+                        _normalize(order_entry.part.verse.lyrics),
+                    )
+                    lyrics_score = max(lyrics_score, s)
+
+            # Weighted score: title > author > lyrics
+            score = max(title_score, author_score * 0.9, lyrics_score * 0.7)
             if score >= FUZZY_THRESHOLD:
                 scored.append((score, song))
 
