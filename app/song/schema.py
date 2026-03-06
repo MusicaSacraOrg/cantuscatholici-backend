@@ -62,6 +62,34 @@ class RelatedSong(BaseModel):
     )
 
 
+class SongCreate(BaseModel):
+    title: str
+    author_id: int
+    description: str | None = None
+    tag_ids: list[int] = []
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
+class SongUpdate(BaseModel):
+    title: str
+    author_id: int
+    description: str | None = None
+    tag_ids: list[int] = []
+
+    model_config = ConfigDict(
+        alias_generator=AliasGenerator(
+            validation_alias=to_snake,
+            serialization_alias=to_camel,
+        ),
+    )
+
+
 class SongDetail(BaseModel):
     id: int
     title: str

@@ -1,9 +1,13 @@
-from fastapi import APIRouter, Query
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
 
 from app.common.deps.pagination import PaginationParamsDep
 from app.database import DbSessionDep
 from app.song import service
-from app.song.schema import SongDetail, SongListResponse
+from app.song.schema import SongCreate, SongDetail, SongListResponse, SongUpdate
+from app.user.schema import UserInDb
+from app.user.service import get_current_user
 
 song_router = APIRouter(
     prefix="/song",
@@ -38,3 +42,35 @@ def get_songs(
 @song_router.get("/{song_id}", response_model=SongDetail)
 def get_song(session: DbSessionDep, song_id: int):
     return service.get_song_detail(session, song_id)
+
+
+@song_router.post("/", response_model=SongDetail)
+def create_song(
+    session: DbSessionDep,
+    body: SongCreate,
+    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    return service.create_song(
+        session, body.title, body.author_id, body.description, body.tag_ids,
+    )
+
+
+@song_router.put("/{song_id}", response_model=SongDetail)
+def update_song(
+    session: DbSessionDep,
+    song_id: int,
+    body: SongUpdate,
+    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    return service.update_song(
+        session, song_id, body.title, body.author_id, body.description, body.tag_ids,
+    )
+
+
+@song_router.delete("/{song_id}", status_code=204)
+def delete_song(
+    session: DbSessionDep,
+    song_id: int,
+    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+):
+    service.delete_song(session, song_id)

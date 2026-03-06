@@ -1,6 +1,8 @@
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel, to_snake
 
+from app.common.schemas.pagination import Paginated
+
 
 class PersonBase(BaseModel):
     name: str
@@ -21,3 +23,6 @@ class PersonCreate(PersonBase):
 
 class PersonInDb(PersonBase):
     id: int
+
+
+PersonList = Paginated[PersonInDb]

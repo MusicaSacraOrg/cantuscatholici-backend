@@ -1,13 +1,14 @@
 from collections import defaultdict
 
 from rapidfuzz import fuzz
-from sqlalchemy import func, select
+from sqlalchemy import delete as sa_delete, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.common.deps.pagination import PaginationParams
 from app.person.models import Person
 from app.song.associations import song_tags
-from app.song.exceptions import SongNotFoundException
+from app.song.exceptions import SongNotFoundException, SongTitleTakenException
 from app.song.models import Song
 from app.tag.models import Tag
 from app.tag_category.models import TagCategory
@@ -177,3 +178,66 @@ def get_song_detail(session: Session, song_id: int) -> dict:
         "added_at": song.added_at.isoformat() if song.added_at else None,
         "last_edit_at": song.last_edit_at.isoformat() if song.last_edit_at else None,
     }
+
+
+def create_song(
+    session: Session,
+    title: str,
+    author_id: int,
+    description: str | None = None,
+    tag_ids: list[int] | None = None,
+) -> dict:
+    song = Song(title=title, author=author_id, description=description)
+    try:
+        with session.begin():
+            session.add(song)
+            session.flush()
+            if tag_ids:
+                session.execute(
+                    song_tags.insert(),
+                    [{"song_id": song.id, "tag_id": tid} for tid in tag_ids],
+                )
+    except IntegrityError as e:
+        raise SongTitleTakenException("Song title already exists") from e
+    return get_song_detail(session, song.id)
+
+
+def update_song(
+    session: Session,
+    song_id: int,
+    title: str,
+    author_id: int,
+    description: str | None = None,
+    tag_ids: list[int] | None = None,
+) -> dict:
+    song = session.get(Song, song_id)
+    if song is None:
+        raise SongNotFoundException("Song not found")
+    try:
+        with session.begin():
+            song.title = title
+            song.author = author_id
+            song.description = description
+            session.add(song)
+            session.execute(
+                sa_delete(song_tags).where(song_tags.c.song_id == song_id),
+            )
+            if tag_ids:
+                session.execute(
+                    song_tags.insert(),
+                    [{"song_id": song_id, "tag_id": tid} for tid in tag_ids],
+                )
+    except IntegrityError as e:
+        raise SongTitleTakenException("Song title already exists") from e
+    return get_song_detail(session, song_id)
+
+
+def delete_song(session: Session, song_id: int) -> None:
+    song = session.get(Song, song_id)
+    if song is None:
+        raise SongNotFoundException("Song not found")
+    with session.begin():
+        session.execute(
+            sa_delete(song_tags).where(song_tags.c.song_id == song_id),
+        )
+        session.delete(song)
