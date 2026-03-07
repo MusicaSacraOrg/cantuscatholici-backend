@@ -1,17 +1,18 @@
-from typing import TYPE_CHECKING
+import enum
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Enum
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 
-if TYPE_CHECKING:
-    from app.models.user import User
 
+class UserRoleEnum(str, enum.Enum):
+    admin = "admin"
+    editor = "editor"
+    common = "common"
 
 class UserRole(Base):
     __tablename__ = "user_roles"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    role: Mapped[str] = mapped_column(nullable=False, unique=True)
-
-    users: Mapped[list["User"]] = relationship("User", back_populates="role")
+    role: Mapped[UserRoleEnum] = mapped_column(Enum(UserRoleEnum), nullable=False)
