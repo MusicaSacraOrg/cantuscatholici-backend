@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, func
+from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.content_base import ContentBase
 from app.models.person import Person
 
 if TYPE_CHECKING:
@@ -12,47 +11,15 @@ if TYPE_CHECKING:
 
 
 class User(Person):
-    __tablename__ = 'users'
+    """Specialization of Person — a registered user with login credentials."""
+    __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(
-        ForeignKey('persons.id'), primary_key=True)
-    email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    hashed_password: Mapped[str] = mapped_column(nullable=False)
-    mobile: Mapped[str] = mapped_column(nullable=True, unique=True)
-    role_id: Mapped[int] = mapped_column(
-        ForeignKey('user_roles.id'), nullable=False)
-    registered_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
+    id: Mapped[int] = mapped_column(ForeignKey("persons.id"), primary_key=True)
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    mobile: Mapped[str | None] = mapped_column(String, unique=True, nullable=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("user_roles.id"), nullable=False)
+    registered_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=False)
 
-    # relationship
-    role: Mapped["UserRole"] = relationship("UserRole", back_populates="users")
+    role: Mapped["UserRole"] = relationship("UserRole")
 
-
-class UserContent(ContentBase):
-    __tablename__ = 'user_content'
-
-    id: Mapped[int] = mapped_column(
-        ForeignKey('content_base.id'), primary_key=True)
-    title: Mapped[str] = mapped_column(nullable=False)
-    description: Mapped[str] = mapped_column(nullable=True)
-    file_id: Mapped[int | None] = mapped_column(
-        ForeignKey('static_content.id'), nullable=True)
-    mscz_id: Mapped[int | None] = mapped_column(
-        ForeignKey('mscz_content.id'), nullable=True)
-    author: Mapped[str] = mapped_column(nullable=True)
-    added_by_user_id: Mapped[int] = mapped_column(
-        ForeignKey('users.id'), nullable=False)
-    tag_id: Mapped[int | None] = mapped_column(
-        ForeignKey('tags.id'), nullable=True)
-    added_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
-
-    __mapper_args__: ClassVar = {
-        "polymorphic_identity": "user_content",
-    }
+    __mapper_args__ = {"polymorphic_identity": "user"}

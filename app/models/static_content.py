@@ -1,7 +1,6 @@
-from typing import ClassVar
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.content_base import ContentBase
 
@@ -9,10 +8,10 @@ from app.models.content_base import ContentBase
 class StaticContent(ContentBase):
     __tablename__ = 'static_content'
 
-    id: Mapped[int] = mapped_column(
-        ForeignKey('content_base.id'), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    content_base_id: Mapped[int] = mapped_column(
+        ForeignKey("content_base.id"), nullable=False,
+    )
     path: Mapped[str] = mapped_column(unique=True, nullable=False)
 
-    __mapper_args__: ClassVar = {
-        "polymorphic_identity": "static_content",
-    }
+    content_base: Mapped["ContentBase"] = relationship("ContentBase")
