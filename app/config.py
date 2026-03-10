@@ -85,7 +85,18 @@ class AuthSettings(BaseSettings):
     )
 
 
+class TranspositionSettings(BaseSettings):
+    service_url: str = "http://transposition-service:8001"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="TRANSPOSITION_",
+        extra="ignore",
+    )
+
+
 postgres_settings = PostgresSettings()  # pyright: ignore[reportCallIssue]
 log_settings = LogSettings()
 app_settings = AppSettings()
 auth_settings = AuthSettings()  # pyright: ignore[reportCallIssue]
+transposition_settings = TranspositionSettings()

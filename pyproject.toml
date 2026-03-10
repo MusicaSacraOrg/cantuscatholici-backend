@@ -16,12 +16,12 @@ dependencies = [
     "python-dotenv>=1.1.1",
     "rapidfuzz>=3.13.0",
     "sqlalchemy>=2.0.41",
+    "httpx>=0.28.1",
     "unidecode>=1.4.0",
 ]
 
 [dependency-groups]
 dev = [
-    "httpx>=0.28.1",
     "pyright>=1.1.402",
     "pytest>=8.4.1",
     "pytest-alembic>=0.12.1",
