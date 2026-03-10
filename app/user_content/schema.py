@@ -44,6 +44,7 @@ class UserContentRead(BaseModel):
     added_by_name: str | None = None
     song_id: int | None = None
     added_at: str | None = None
+    review_status: str | None = None
 
     model_config = ConfigDict(
         alias_generator=AliasGenerator(

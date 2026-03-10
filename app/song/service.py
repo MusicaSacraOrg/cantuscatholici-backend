@@ -111,12 +111,16 @@ def get_songs(
             # Weighted score: title > author > lyrics
             score = max(title_score, author_score * 0.9, lyrics_score * 0.7)
             if score >= FUZZY_THRESHOLD:
-                scored.append((score, song))
+                # Find best lyrics snippet
+                snippet = None
+                if lyrics_score >= FUZZY_THRESHOLD:
+                    snippet = _extract_lyrics_snippet(song, search_query)
+                scored.append((score, song, snippet))
 
         scored.sort(key=lambda x: x[0], reverse=True)
         total = len(scored)
         page_songs = scored[pagination.offset:pagination.offset + pagination.limit]
-        items = [_song_to_dict(s) for _, s in page_songs]
+        items = [_song_to_dict(s, lyrics_snippet=snip) for _, s, snip in page_songs]
     else:
         total = session.scalar(count_stmt)
         songs = (
@@ -134,7 +138,10 @@ def get_songs(
     }
 
 
-def _song_to_dict(song: Song) -> dict:
+def _song_to_dict(
+    song: Song,
+    lyrics_snippet: str | None = None,
+) -> dict:
     author_name = None
     if song.author_person:
         p = song.author_person
@@ -152,13 +159,53 @@ def _song_to_dict(song: Song) -> dict:
     if desc and len(desc) > 200:
         desc = desc[:200] + "..."
 
-    return {
+    result = {
         "id": song.id,
         "title": song.title,
         "author_name": author_name,
         "tags": tag_list,
         "description": desc,
     }
+    if lyrics_snippet:
+        result["lyrics_snippet"] = lyrics_snippet
+    return result
+
+
+def _extract_lyrics_snippet(song: Song, query: str, max_len: int = 100) -> str | None:
+    normalized_query = _normalize(query)
+    best_score = 0
+    best_text = None
+
+    for order_entry in song.lyrics_order:
+        if not (order_entry.part and order_entry.part.verse):
+            continue
+        text = order_entry.part.verse.lyrics
+        score = fuzz.partial_ratio(normalized_query, _normalize(text))
+        if score > best_score:
+            best_score = score
+            best_text = text
+
+    if not best_text:
+        return None
+
+    # Find approximate position of match
+    normalized_text = _normalize(best_text)
+    pos = normalized_text.find(normalized_query)
+    if pos == -1:
+        # Fallback: take the beginning
+        pos = 0
+
+    # Extract window around match
+    start = max(0, pos - 30)
+    end = min(len(best_text), pos + len(query) + max_len - 30)
+
+    snippet = best_text[start:end].strip()
+    if start > 0:
+        snippet = "..." + snippet
+    if end < len(best_text):
+        snippet = snippet + "..."
+
+    return snippet
 
 
 def get_song_detail(session: Session, song_id: int) -> dict:
@@ -236,15 +283,16 @@ def create_song(
 ) -> dict:
     song = Song(title=title, author=author_id, description=description)
     try:
-        with session.begin():
-            session.add(song)
-            session.flush()
-            if tag_ids:
-                session.execute(
-                    song_tags.insert(),
-                    [{"song_id": song.id, "tag_id": tid} for tid in tag_ids],
-                )
+        session.add(song)
+        session.flush()
+        if tag_ids:
+            session.execute(
+                song_tags.insert(),
+                [{"song_id": song.id, "tag_id": tid} for tid in tag_ids],
+            )
+        session.commit()
     except IntegrityError as e:
+        session.rollback()
         raise SongTitleTakenException("Song title already exists") from e
     return get_song_detail(session, song.id)
 
@@ -261,20 +309,21 @@ def update_song(
     if song is None:
         raise SongNotFoundException("Song not found")
     try:
-        with session.begin():
-            song.title = title
-            song.author = author_id
-            song.description = description
-            session.add(song)
+        song.title = title
+        song.author = author_id
+        song.description = description
+        session.add(song)
+        session.execute(
+            sa_delete(song_tags).where(song_tags.c.song_id == song_id),
+        )
+        if tag_ids:
             session.execute(
-                sa_delete(song_tags).where(song_tags.c.song_id == song_id),
+                song_tags.insert(),
+                [{"song_id": song_id, "tag_id": tid} for tid in tag_ids],
             )
-            if tag_ids:
-                session.execute(
-                    song_tags.insert(),
-                    [{"song_id": song_id, "tag_id": tid} for tid in tag_ids],
-                )
+        session.commit()
     except IntegrityError as e:
+        session.rollback()
         raise SongTitleTakenException("Song title already exists") from e
     return get_song_detail(session, song_id)
 

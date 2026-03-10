@@ -23,6 +23,7 @@ class SongListItem(BaseModel):
     author_name: str | None = None
     tags: list[SongTagItem] = []
     description: str | None = None
+    lyrics_snippet: str | None = None
 
     model_config = ConfigDict(
         alias_generator=AliasGenerator(

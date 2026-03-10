@@ -1,7 +1,9 @@
 FROM python:3.12-alpine
 
-# Install the musescore package
-RUN apk add --no-cache musescore nodejs npm
+# Install runtime deps:
+# - musescore for transposition/export
+# - xvfb-run for headless display required by MuseScore in containers
+RUN apk add --no-cache musescore xvfb-run nodejs npm
 
 # Install svgo
 RUN npm install -g svgo --unsafe-perm

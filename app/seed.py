@@ -4,6 +4,7 @@ Run inside the Docker container:
     docker compose exec cantuscatholici-api python -m app.seed
 """
 
+from pydantic import SecretStr
 from sqlalchemy import select
 
 import app.models  # noqa: F401  — registers all ORM models
@@ -13,6 +14,9 @@ from app.song.associations import song_tags
 from app.song.models import Song
 from app.tag.models import Tag
 from app.tag_category.models import TagCategory
+from app.user.models import User
+from app.user_role.models import UserRole
+from app.user.auth import get_password_hash
 
 TAG_CATEGORIES = [
     {"name": "Liturgický rok", "color": "purple"},
@@ -164,6 +168,68 @@ def seed():
         print(f"Seeded {len(TAG_CATEGORIES)} categories, "
               f"{sum(len(v) for v in TAGS_BY_CATEGORY.values())} tags, "
               f"{len(AUTHORS)} authors, {len(SONGS)} songs.")
+
+        # Create test users
+        _seed_test_users(session)
+
+
+TEST_USERS = [
+    {
+        "name": "Test",
+        "surname": "User",
+        "email": "user@test.com",
+        "password": "TestPass123!",
+        "role": "User",
+    },
+    {
+        "name": "Test",
+        "surname": "Redactor",
+        "email": "redactor@test.com",
+        "password": "TestPass123!",
+        "role": "Redactor",
+    },
+    {
+        "name": "Test",
+        "surname": "Admin",
+        "email": "admin@test.com",
+        "password": "TestPass123!",
+        "role": "Admin",
+    },
+]
+
+
+def _seed_test_users(session):
+    existing = session.scalar(select(User).where(User.email == "user@test.com"))
+    if existing:
+        print("Test users already exist. Skipping.")
+        return
+
+    role_map = {}
+    for role in session.scalars(select(UserRole)).all():
+        role_map[role.role] = role.id
+
+    if not role_map:
+        # Create roles if they don't exist
+        for role_name in ["User", "Redactor", "Admin"]:
+            role = UserRole(role=role_name)
+            session.add(role)
+        session.flush()
+        for role in session.scalars(select(UserRole)).all():
+            role_map[role.role] = role.id
+
+    for user_data in TEST_USERS:
+        hashed = get_password_hash(SecretStr(user_data["password"]))
+        user = User(
+            name=user_data["name"],
+            surname=user_data["surname"],
+            email=user_data["email"],
+            hashed_password=hashed,
+            role_id=role_map[user_data["role"]],
+        )
+        session.add(user)
+
+    session.commit()
+    print(f"Seeded {len(TEST_USERS)} test users.")
 
 
 if __name__ == "__main__":

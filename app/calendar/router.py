@@ -5,9 +5,10 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 
 from app.calendar import service
+from app.common.deps.auth import require_role
 from app.database import DbSessionDep
 from app.user.schema import UserInDb
-from app.user.service import get_current_user
+from app.user_role.service import PredefinedUserRoles
 
 calendar_router = APIRouter(
     prefix="/calendar",
@@ -59,11 +60,14 @@ def get_song_calendar(session: DbSessionDep, song_id: int):
     return service.get_entries_for_song(session, song_id)
 
 
+_require_redactor = require_role(PredefinedUserRoles.REDACTOR, PredefinedUserRoles.ADMIN)
+
+
 @calendar_router.post("/")
 def create_entry(
     session: DbSessionDep,
     body: CalendarEntryCreate,
-    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+    _current_user: Annotated[UserInDb, Depends(_require_redactor)],
 ):
     return service.create_entry(
         session,
@@ -82,7 +86,7 @@ def update_entry(
     session: DbSessionDep,
     entry_id: int,
     body: CalendarEntryUpdate,
-    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+    _current_user: Annotated[UserInDb, Depends(_require_redactor)],
 ):
     return service.update_entry(
         session,
@@ -100,6 +104,6 @@ def add_song(
     session: DbSessionDep,
     entry_id: int,
     song_id: int,
-    _current_user: Annotated[UserInDb, Depends(get_current_user)],
+    _current_user: Annotated[UserInDb, Depends(_require_redactor)],
 ):
     return service.add_song_to_entry(session, entry_id, song_id)

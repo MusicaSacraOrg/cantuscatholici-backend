@@ -2,6 +2,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.review.service import create_review
+from app.song.models import SongMr
 from app.user.models import UserContent
 from app.user_content.exceptions import (
     UserContentForbiddenException,
@@ -9,7 +10,14 @@ from app.user_content.exceptions import (
 )
 
 
-def _uc_to_dict(uc: UserContent) -> dict:
+def _get_review_status(session: Session, uc_id: int) -> str | None:
+    review = session.scalars(
+        select(SongMr).where(SongMr.reviewable_id == uc_id).limit(1)
+    ).first()
+    return review.status if review else None
+
+
+def _uc_to_dict(uc: UserContent, review_status: str | None = None) -> dict:
     added_by_name = None
     if uc.added_by_user:
         u = uc.added_by_user
@@ -27,6 +35,7 @@ def _uc_to_dict(uc: UserContent) -> dict:
         "added_by_name": added_by_name,
         "song_id": uc.song_id,
         "added_at": uc.added_at.isoformat() if uc.added_at else None,
+        "review_status": review_status,
     }
 
 
@@ -47,7 +56,10 @@ def get_song_user_content(session: Session, song_id: int) -> dict:
         "total": count or 0,
         "limit": 100,
         "offset": 0,
-        "items": [_uc_to_dict(uc) for uc in items],
+        "items": [
+            _uc_to_dict(uc, _get_review_status(session, uc.id))
+            for uc in items
+        ],
     }
 
 
