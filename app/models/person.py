@@ -22,8 +22,3 @@ class Person(Base):
     )
 
     avatar: Mapped[Optional["StaticContent"]] = relationship("StaticContent")
-
-    __mapper_args__ = {
-        "polymorphic_on": "type",
-        "polymorphic_identity": "person",
-    }
