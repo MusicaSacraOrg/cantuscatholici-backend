@@ -51,21 +51,19 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
+    from sqlalchemy import create_engine
 
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
+    from app.config import log_settings, postgres_settings
 
-    """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+    connectable = create_engine(
+        str(postgres_settings.postgres_dsn),
+        echo=log_settings.db_engine_echo,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():

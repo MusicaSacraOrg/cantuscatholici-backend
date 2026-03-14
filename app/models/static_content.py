@@ -2,10 +2,11 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.database import Base
 from app.models.content_base import ContentBase
 
 
-class StaticContent(ContentBase):
+class StaticContent(Base):
     __tablename__ = 'static_content'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
