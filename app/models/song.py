@@ -37,8 +37,8 @@ class Song(Base):
         ForeignKey("users.id"), nullable=True,
     )
 
-    content_base: Mapped["ContentBase"] = relationship("ContentBase")
-    added_by_user: Mapped[Optional["User"]] = relationship("User")
+    content_base: Mapped["ContentBase"] = relationship("ContentBase", foreign_keys=[content_base_id])
+    added_by_user: Mapped[Optional["User"]] = relationship("User", foreign_keys=[added_by_user_id])
     tags: Mapped[list["Tag"]] = relationship("Tag", secondary="song_tags")
     authors: Mapped[list["Author"]] = relationship("Author", secondary="song_authors")
     parts: Mapped[list["SongPart"]] = relationship(
@@ -102,7 +102,7 @@ class SongScore(Base):
     )
     added_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    content_base: Mapped["ContentBase"] = relationship("ContentBase")
-    song: Mapped["Song"] = relationship("Song")
-    static_content: Mapped["StaticContent"] = relationship("StaticContent")
+    content_base: Mapped["ContentBase"] = relationship("ContentBase", foreign_keys=[content_base_id])
+    song: Mapped["Song"] = relationship("Song", foreign_keys=[song_id])
+    static_content: Mapped["StaticContent"] = relationship("StaticContent", foreign_keys=[static_content_id])
 

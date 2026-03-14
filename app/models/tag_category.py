@@ -11,4 +11,4 @@ class TagCategory(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     order_index: Mapped[int] = mapped_column(nullable=False)
 
-    tags: Mapped[list["Tag"]] = relationship("Tag", back_populates="category")
+    tags: Mapped[list["Tag"]] = relationship("Tag", back_populates="category")  # noqa: F821

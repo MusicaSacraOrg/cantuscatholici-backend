@@ -7,7 +7,7 @@ from ..schemas.tag import Tag as TagSchema
 ALLOWED_ORDER_FIELDS = {
     "id": Tag.id,
     "name": Tag.name,
-    "category_id": Tag.category_id,
+    "tag_category_id": Tag.tag_category_id,
 }
 
 def db_get_tags(
@@ -56,10 +56,10 @@ def db_get_tags_by_category(
         order_by: str | None = None,
 ) -> tuple[int, list[TagSchema] | None]:
     total = db.execute(
-        select(func.count()).select_from(Tag).where(Tag.category_id == tag_category_id),
+        select(func.count()).select_from(Tag).where(Tag.tag_category_id == tag_category_id),
     ).scalar_one()
 
-    stmt = select(Tag).where(Tag.category_id == tag_category_id)
+    stmt = select(Tag).where(Tag.tag_category_id == tag_category_id)
 
     if order_by in ALLOWED_ORDER_FIELDS:
         column = ALLOWED_ORDER_FIELDS[order_by]

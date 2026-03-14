@@ -27,4 +27,7 @@ class Author(Person):
 
     content_base: Mapped["ContentBase"] = relationship("ContentBase")
     person: Mapped["Person"] = relationship("Person")
-    added_by_user: Mapped[Optional["User"]] = relationship("User")
+    added_by_user: Mapped[Optional["User"]] = relationship(
+        "User",
+        foreign_keys=[added_by_user_id],
+    )

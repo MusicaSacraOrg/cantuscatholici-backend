@@ -1,5 +1,5 @@
-import datetime
 import enum
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, Text
@@ -61,4 +61,6 @@ class CelebrationSong(Base):
         "Celebration", back_populates="songs",
     )
     song: Mapped["Song"] = relationship("Song")
-    celebration_part: Mapped[Optional["CelebrationPart"]] = relationship("CelebrationPart")
+    celebration_part: Mapped[Optional["CelebrationPart"]] = relationship(
+        "CelebrationPart",
+    )

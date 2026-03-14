@@ -20,6 +20,6 @@ class User(Person):
     role_id: Mapped[int] = mapped_column(ForeignKey("user_roles.id"), nullable=False)
     registered_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=False)
 
-    role: Mapped["UserRole"] = relationship("UserRole")
+    role: Mapped["UserRole"] = relationship("UserRole", foreign_keys=[role_id])
 
     __mapper_args__ = {"polymorphic_identity": "user"}

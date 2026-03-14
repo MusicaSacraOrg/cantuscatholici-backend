@@ -37,13 +37,13 @@ async def get_tag_by_id_endpoint(tag_id: int, db: DbSessionDep):
     return {"tag": get_tag_by_id(tag_id, db)}
 
 
-@tag_router.get("/by-category/{category_tag_id}", response_model=list[TagSchema])
+@tag_router.get("/by-category/{tag_category_id}", response_model=list[TagSchema])
 async def get_tags_by_category_id_endpoint(
-        category_tag_id: int,
+        tag_category_id: int,
         db: DbSessionDep,
         pagination: PaginationParamsDep,
 ):
-    return get_tags_by_category(category_tag_id, db, pagination)
+    return get_tags_by_category(tag_category_id, db, pagination)
 
 
 @tag_router.post("/create", response_model=TagSchema)

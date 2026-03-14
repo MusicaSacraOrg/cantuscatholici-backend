@@ -12,6 +12,6 @@ class CelebrationCategory(Base):
     name: Mapped[str | None] = mapped_column(String, nullable=True)
     order_index: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    celebrations: Mapped[list["Celebration"]] = relationship(
+    celebrations: Mapped[list["Celebration"]] = relationship(  # noqa: F821
         "Celebration", back_populates="category",
     )

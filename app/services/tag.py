@@ -70,7 +70,7 @@ def get_tags_by_category(
 def create_tag(tag: TagCreateSchema, db: Session) -> TagSchema:
     new_tag = Tag(
         name=tag.name,
-        category_id=tag.category_id,
+        tag_category_id=tag.tag_category_id,
     )
 
     try:
