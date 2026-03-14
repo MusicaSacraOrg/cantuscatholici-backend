@@ -1,17 +1,17 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
 import app.models
 from app.common.exceptions import DomainError
 from app.database import SessionLocal
-from app.routes.calendar import calendar_router
 from app.routes.review import review_router
 from app.routes.song import song_router
 from app.routes.static_content import static_content_router
 from app.routes.tag import tag_router
+from app.routes.tag_tegory import tag_category_router
 from app.routes.user import user_router
 from app.routes.user_role import user_role_router
 from app.services.user_role import ensure_all_exist
@@ -50,6 +50,8 @@ ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:8000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
 
 ORIGIN_REGEX = r"^https:\/\/([a-z0-9-]+\.)?cantuscatholici\.sk$"
@@ -63,12 +65,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+api_router = APIRouter(prefix="/api")
 
-app.include_router(calendar_router)
 app.include_router(static_content_router)
 app.include_router(review_router)
 app.include_router(song_router)
 app.include_router(tag_router)
+app.include_router(tag_category_router)
 app.include_router(user_router)
 app.include_router(user_role_router)
 
