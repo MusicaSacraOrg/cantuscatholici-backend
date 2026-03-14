@@ -56,25 +56,6 @@ services:
         condition: service_healthy
         restart: true
 
-  seed:
-    image: '${DOCKER_IMAGE?Variable not set}:${TAG-latest}'
-    env_file:
-      - .env
-    environment:
-      POSTGRES_HOST: db
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: [ "python", "seed_db.py" ]
-    volumes:
-      - ./seed_db.py:/app/seed_db.py:rw
-      - cantuscatholici-static-content:${APP_STATIC_CONTENT_PREFIX?Variable not set}
-    depends_on:
-      alembic:
-        condition: service_completed_successfully
-      db:
-        condition: service_healthy
-
   db:
     image: postgres:17.6-alpine
     environment:
