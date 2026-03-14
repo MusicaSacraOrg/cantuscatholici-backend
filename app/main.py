@@ -1,12 +1,20 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 
 import app.models
 from app.common.exceptions import DomainError
+from app.config import storage_settings
 from app.database import SessionLocal
+from app.routes.author import author_router
+from app.routes.celebration import celebration_router
+from app.routes.celebration_category import celebration_category_router
+from app.routes.celebration_part import celebration_part_router
+from app.routes.person import person_router
 from app.routes.review import review_router
 from app.routes.song import song_router
 from app.routes.static_content import static_content_router

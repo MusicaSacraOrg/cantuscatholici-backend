@@ -73,6 +73,16 @@ class AppSettings(BaseSettings):
     )
 
 
+class StorageSettings(BaseSettings):
+    upload_dir: str = "/data/cantuscatholici/uploads"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="STORAGE_",
+        extra="ignore",
+    )
+
+
 class AuthSettings(BaseSettings):
     secret_key: str
     algorithm: str = "HS512"
@@ -88,4 +98,5 @@ class AuthSettings(BaseSettings):
 postgres_settings = PostgresSettings()  # pyright: ignore[reportCallIssue]
 log_settings = LogSettings()
 app_settings = AppSettings()
+storage_settings = StorageSettings()
 auth_settings = AuthSettings()  # pyright: ignore[reportCallIssue]
